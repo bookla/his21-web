@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Password Reset</title>
+
+    <link rel="stylesheet" href="common-style.css">
+    <link rel="shortcut icon" type="image/ico" href="https://www.harrowschool.ac.th/uploaded/favicon_Harrow.ico"/>
+</head>
+<body onload="setupUI(); verify()">
+
+<div class="background"></div>
+
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-auth.js"></script>
+
+<div style="position: absolute; top: 50%; left: 50%; align-content: center;" class="container" id="action-box">
+    <h1 style="width: 100%; text-align: center; color: black" id="main-text">Reset Password</h1>
+    <p id="description-text" style="color: black">Authenticating with Server...</p>
+    <label>
+        <input id="password-1" class="credentialsBox" style="margin-bottom: 5px" type="password" placeholder="Password">
+    </label>
+    <label>
+        <input id="password-2" class="credentialsBox" type="password" placeholder="Re-type Password">
+    </label>
+    <button id="reset-button" onclick="setPassword()" style="width: 100%; height: 40px; margin-top: 20px; border-radius: 10px; border-width: 0; box-shadow: lightgray; padding-right: 10px; background-color: white; font-size: 20px" class="deactivatedButton" disabled>Reset Password</button>
+</div>
+
+<script src="credentials.js"></script>
+
+<script>
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+</script>
+
+<script>
+    const screenHeight = window.screen.height
+    const screenWidth = window.screen.width
+    const smallestSize = (screenHeight > screenWidth) ? screenWidth : screenHeight
+    const boxWidthRelative = 0.7
+
+    function setPassword() {
+        let paramData = getJsonFromUrl()
+        let code = paramData["oobCode"]
+        let auth = firebase.auth()
+
+        let password1 = document.getElementById("password-1").value;
+        let password2 = document.getElementById("password-2").value;
+
+        if (password1 !== password2) {
+            alert("Passwords don't match!")
+            return
+        }
+
+        auth.confirmPasswordReset(code, password1).then((resp) => {
+            window.location = "./login.html"
+        }).catch((error) => {
+            alert(error)
+        });
+    }
+
+
+    function setupUI() {
+        let actionBox = document.getElementById("action-box")
+        const boxWidth = smallestSize*boxWidthRelative
+        actionBox.style.height = "auto"
+        const boxHeight = actionBox.clientHeight
+        actionBox.style.width = boxWidth.toString() + "px"
+        actionBox.style.margin = "-" + (boxHeight/2).toString() + "px 0 0 -" + (boxWidth/2).toString() + "px"
+        actionBox.style.borderRadius = "5px"
+    }
+
+    function verify() {
+        console.log("INITIALISE")
+        let paramData = getJsonFromUrl()
+        let code = paramData["oobCode"]
+        let mode = paramData["mode"]
+        let auth = firebase.auth()
+
+        if (mode !== "resetPassword") {
+            window.location = "./login.html"
+        }
+
+        auth.verifyPasswordResetCode(code).then((email) => {
+            console.log("OopCode Verified")
+            console.log(email)
+            document.getElementById("description-text").innerHTML = "Authenticated. Resetting password for : " + email
+            document.getElementById("reset-button").disabled = false
+        }).catch((error) => {
+            document.getElementById("description-text").innerHTML = "Authentication Failed"
+            alert("Invalid or expired action code. Try requesting password request again.")
+            console.warn(error)
+            window.location = "./login.html"
+        });
+    }
+
+    function getJsonFromUrl(url) {
+        if(!url) url = location.search;
+        let query = url.substr(1);
+        let result = {};
+        query.split("&").forEach(function(part) {
+            let item = part.split("=");
+            result[item[0]] = decodeURIComponent(item[1]);
+        });
+        return result;
+    }
+</script>
+</body>
+</html>

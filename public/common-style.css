@@ -1,0 +1,50 @@
+.credentialsBox {
+    font-size: 16px;
+    border-radius: 30px;
+    box-shadow: lightgray;
+    border-width: thin;
+    height: 30px;
+    width:100%
+}
+
+.background {
+    background-color: #03164d;
+    height: 100%;
+    width: 100%;
+    background-position: center;
+    background-repeat: repeat-y;
+    background-size: cover;
+}
+
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: sans-serif;
+}
+
+h1, h2, h3, h4, p, button, a {
+    font-family: sans-serif;
+}
+
+h1, h2, h3, h4, button, a {
+    font-weight: bold;
+}
+
+
+.container {
+    padding: 20px;
+    background-color: #dddddd;
+}
+
+input {
+    margin-right: 20px;
+    width: 80%;
+}
+
+.activatedButton {
+    background-color: #039be5;
+}
+
+.deactivatedButton {
+    background-color: #888888;
+}

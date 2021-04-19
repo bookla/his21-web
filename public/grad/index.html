@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HIS21 Graduate Profiles</title>
+
+    <link rel="stylesheet" href="grad-style.css">
+    <link rel="stylesheet" href="../common-style.css">
+</head>
+<body onload="init()">
+
+<div id="background-image"  class="image-background" style="">
+    <div class="blur-div" id="blur-div" style="overflow: auto; padding-left: 20px">
+        <div id="main-div" style="width:70%; margin-left: 14%; margin-right: 15%; padding-top:8%; padding-bottom: 10%">
+            <h1 class="gradTitle">HIS21 Graduates</h1>
+
+            <div id="students-list">
+
+            </div>
+
+            <div id="page-navigator">
+                <p id="page-indicator" style="text-align: center; width: 100%">Page Number</p>
+                <a id="back-button" class="back" style="float: left;" href="#" onclick="lastPage()">Back</a>
+                <a id="next-button" class="next" style="float: right;" href="#" onclick="nextPage()">Next</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let page = 0
+    let pageTotal = 0
+    let pageSize = 10
+
+    function nextPage() {
+        if (pageTotal !== 0 && page < pageTotal) {
+            page += 1
+            document.getElementById("students-list").innerHTML = ""
+            loadUsers()
+            updatePageIndicator()
+        }
+    }
+
+    function lastPage() {
+        if (page > 0) {
+            page -= 1
+            document.getElementById("students-list").innerHTML = ""
+            loadUsers()
+            updatePageIndicator()
+        }
+    }
+
+    function updatePageIndicator() {
+        document.getElementById("page-indicator").innerText = "Page (" + (page + 1).toString() + "/" + (pageTotal + 1).toString() + ")"
+    }
+
+    function createCell(name, description, imageSrc, uid) {
+        let cell = document.createElement("div")
+        cell.id = "D-" + uid
+        cell.className = "cell"
+        cell.onclick = function () {
+            window.location = "profile.html?uid=" + uid.toString()
+        }
+
+        let imageDiv = document.createElement("div")
+        imageDiv.id = "L-" + generateUID(6)
+        imageDiv.className = "cellImageDiv"
+
+        let image = document.createElement("img")
+        image.className = "cellImage"
+        image.alt = name + "'s Profile Picture"
+        image.src = imageSrc
+
+        imageDiv.appendChild(image)
+
+        cell.appendChild(imageDiv)
+
+        let infoDiv = document.createElement("div")
+        infoDiv.id = "R-" + generateUID(6)
+        infoDiv.className = "cellInfoDiv"
+        infoDiv.style.paddingRight = "10px"
+
+        let nameNode = document.createElement("h2")
+        nameNode.id = "T-" + generateUID(6)
+        nameNode.className = "cellName"
+        nameNode.innerText = name
+
+        infoDiv.appendChild(nameNode)
+
+        let detailNode = document.createElement("p")
+        detailNode.id = "B-" + generateUID(6)
+        detailNode.className = "cellDescription"
+        detailNode.innerText = description
+
+        infoDiv.appendChild(detailNode)
+
+        cell.appendChild(infoDiv)
+
+        document.getElementById("students-list").appendChild(cell)
+
+        adjustUI()
+    }
+
+
+    function getUniversityAndCreate(name, uid, image, universityID, course) {
+        db.collection("gradUni").doc(universityID).get().then(function (doc) {
+            if (doc.exists) {
+                let data = doc.data()
+
+                let uniName = data["name"]
+                let description = uniName + " - " + course
+
+                createCell(name, description, image, uid)
+            }
+        })
+    }
+
+    function loadUsers() {
+        let i = -1
+        db.collection("gradData").orderBy("name").get().then((querySnapshot) => {
+            pageTotal = Math.floor(querySnapshot.size/pageSize)
+            updatePageIndicator()
+            querySnapshot.forEach((doc) => {
+                i++
+                if (page*pageSize < i <= page*pageSize + pageSize) {
+                    let data = doc.data()
+
+                    let name = data["name"]
+                    let uid = doc.id
+                    let image = data["img"]
+                    let universityID = data["universityID"]
+                    let course = data["courseName"]
+
+                    getUniversityAndCreate(name, uid, image, universityID, course)
+                }
+            });
+        });
+    }
+
+    function adjustUI() {
+        if (document.getElementsByTagName("body")[0].clientWidth < document.getElementsByTagName("body")[0].clientHeight) {
+            document.getElementById("main-div").style.width = "90%"
+            document.getElementById("main-div").style.marginLeft = "4%"
+            document.getElementById("main-div").style.marginRight = "5%"
+        } else {
+            document.getElementById("main-div").style.width = "70%"
+            document.getElementById("main-div").style.marginLeft = "14%"
+            document.getElementById("main-div").style.marginRight = "15%"
+        }
+
+        document.getElementById("background-image").style.width = document.getElementsByTagName("body")[0].clientWidth.toString() + "px"
+        document.getElementById("background-image").style.height = document.getElementsByTagName("body")[0].scrollHeight.toString() + "px"
+
+        document.getElementById("blur-div").style.width = (document.getElementsByTagName("body")[0].clientWidth - 20).toString() + "px"
+        document.getElementById("blur-div").style.height = document.getElementsByTagName("body")[0].scrollHeight.toString() + "px"
+
+        let divs = document.getElementById("students-list").querySelectorAll("div")
+        for (let i=0; i<divs.length; i++) {
+            let studentCell = divs[i]
+            if (studentCell.id[0] === "D") {
+                let studentNodes = studentCell.querySelectorAll("div")
+                let imageDiv = undefined
+                let nameDiv = undefined
+
+                for (let k=0; k<studentNodes.length; k++) {
+                    if (studentNodes[k].id[0] === "L") {
+                        imageDiv = studentNodes[k]
+                    } else if (studentNodes[k].id[0] === "R") {
+                        nameDiv = studentNodes[k]
+                    }
+                }
+
+                let nameNode = undefined
+                let detailNode = undefined
+
+                let infoNodes = nameDiv.querySelectorAll("h1, h2, h3, h4, h5, h6, p")
+
+                for (let j=0; j<infoNodes.length; j++) {
+                    if (infoNodes[j].id[0] === "T") {
+                        nameNode = infoNodes[j]
+                    } else if (infoNodes[j].id[0] === "B") {
+                        detailNode = infoNodes[j]
+                    }
+                }
+
+                if (document.getElementsByTagName("body")[0].clientWidth < document.getElementsByTagName("body")[0].clientHeight) {
+                    //IF VERTICAL REDUCE FONT SIZE
+                    nameNode.style.fontSize = "34pt"
+                    detailNode.style.fontSize = "20pt"
+                }
+
+                imageDiv.style.height = (imageDiv.clientWidth).toString() + "px"
+
+                if (imageDiv.clientHeight < 150) {
+                    imageDiv.style.height = "150px"
+                    imageDiv.style.width = (imageDiv.clientHeight).toString() + "px"
+                }
+
+                let paddingTotalPercent = 0.0
+                let paddingTotalAbsolute = 30
+                nameDiv.style.width = (studentCell.clientWidth - imageDiv.clientWidth - studentCell.clientWidth*paddingTotalPercent - paddingTotalAbsolute).toString() + "px"
+
+                studentCell.style.height = imageDiv.clientHeight.toString() + "px"
+
+                //AFTER CELL SIZING
+                nameNode.style.paddingTop = "0"
+                nameNode.style.paddingTop = ((studentCell.clientHeight - nameNode.clientHeight - detailNode.clientHeight)/2 - 10).toString() + "px"
+            }
+        }
+    }
+
+
+    function init() {
+        document.getElementById("background-image").style.backgroundImage = "url(media/harrow-international-school.jpg)"
+
+        loadUsers()
+        adjustUI()
+        window.addEventListener("resize", adjustUI);
+    }
+
+    function generateUID(length) {
+        let result           = '';
+        let characters       = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        let charactersLength = characters.length;
+        for (let i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
+    }
+</script>
+
+
+<!-- Importing modules -->
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-analytics.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-firestore.js"></script>
+
+
+<!-- Firebase Integration -->
+
+<script src="../credentials.js"></script>
+
+<script>
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+
+    let db = firebase.firestore();
+</script>
+
+</body>
+</html>

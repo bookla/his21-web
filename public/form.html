@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Leavers' Book Data Collection</title>
+    <link rel="shortcut icon" type="image/ico" href="https://www.harrowschool.ac.th/uploaded/favicon_Harrow.ico"/>
+    <link rel="stylesheet" href="table-style.css">
+
+    <style type="text/css">
+        #uploadingMsg {
+            color: black;
+            background: #fff;
+            padding: 10px;
+            position: fixed;
+            border-radius:10px;
+            top: 40%;
+            left: 30%;
+            z-index: 100;
+            margin-right: -25%;
+            margin-bottom: -25%;
+        }
+        #prepare {
+            background: black;
+            z-index: 99;
+            width: 100%;
+            height: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
+            filter: alpha(opacity=80);
+            -moz-opacity: 0.8;
+            -khtml-opacity: 0.8;
+            opacity: 0.8;
+        }
+
+    </style>
+
+    <style>
+        html *
+        {
+            color: #000;
+            font-family: sans-serif; !important;
+        }
+        .singleLineBox {
+            border:0.5px solid #b3b3b3;
+            background: #ffffff;
+            width:200px;
+            height: 25px;
+            border-radius:5px;
+            -moz-border-radius:5px;
+            -moz-box-shadow:    0.3px 0.3px 0.3px #ccc;
+            -webkit-box-shadow: 0.3px 0.3px 0.3px 0.3px #ccc;
+            box-shadow:         0.3px 0.3px 0.3px 0.3px #ccc;
+        }
+
+        .multiLineBox {
+            border:0.5px solid #b3b3b3;
+            background: #ffffff;
+            width:400px;
+            height: 100px;
+            border-radius:5px;
+            font-size: 12px;
+            -moz-border-radius:5px;
+            -moz-box-shadow:    0.3px 0.3px 0.3px #ccc;
+            -webkit-box-shadow: 0.3px 0.3px 0.3px 0.3px #ccc;
+            box-shadow:         0.3px 0.3px 0.3px 0.3px #ccc;
+            resize: none;
+        }
+
+        .advSelection {
+            border:0.5px solid #b3b3b3;
+            background: #ffffff;
+            width:150px;
+            height: 20px;
+            border-radius:5px;
+            -moz-border-radius:5px;
+            -moz-box-shadow:    0.3px 0.3px 0.3px #ccc;
+            -webkit-box-shadow: 0.3px 0.3px 0.3px 0.3px #ccc;
+            box-shadow:         0.3px 0.3px 0.3px 0.3px #ccc;
+        }
+
+        .submitButton {
+            transition-duration: 0.4s;
+            background-color: rgb(255, 255, 255);
+            color: black;
+            padding: 10px 10px;
+            text-align: center;
+            border-radius:10px;
+            -moz-border-radius:10px;
+            -moz-box-shadow:    0.3px 0.3px 0.3px #ccc;
+            -webkit-box-shadow: 0.3px 0.3px 0.3px 0.3px #ccc;
+            box-shadow:         0.3px 0.3px 0.3px 0.3px #ccc;
+            text-decoration: none;
+            display: inline-block;
+            width: 90px;
+            height: 50px;
+            border: 3px solid #4CAF50;
+            font-size: 16px;
+            font-family: "Helvetica Neue", serif;
+        }
+
+        .submitButton:hover {
+            background-color: #4CAF50; /* Green */
+            color: white;
+        }
+
+        .submitButton:active {
+            background-color: #3e8e41;
+            box-shadow: 0 5px #666;
+            transform: translateY(4px);
+        }
+
+        .adBanner {
+            background-color: transparent;
+            height: 1px;
+            width: 1px;
+        }
+
+        .spoilerToggle {
+            line-height: 2px;
+            font-size: 12px;
+        }
+
+        .titleWithDescription {
+            line-height: 0.8px;
+        }
+
+        .description {
+            padding: 0;
+            margin: 4px;
+            font-style: normal !important;
+            font-weight: 400 !important;
+        }
+
+        .topTitle{
+            display: inline;
+        }
+
+        .footer {
+            font-family: "Helvetica Neue",serif;
+            font-size: 10px;
+            font-style: oblique;
+            padding: 0;
+            margin: 4px;
+        }
+
+        .rightStatus {
+            font-family: "Helvetica Neue",serif;
+            font-size: 14px;
+            font-style: oblique;
+            line-height: 0;
+            position: fixed;
+            top: -20px;
+            width: 99%;
+            font-weight: 400 !important;
+        }
+
+        .rightStatusUpdate {
+            font-family: "Helvetica Neue",serif;
+            font-size: 12px;
+            font-style: oblique;
+            line-height: 0;
+            position: fixed;
+            top: 30px;
+            text-align: right;
+            width: 99%;
+            font-weight: 400 !important;
+        }
+
+        .rightSignOut {
+            font-family: "Helvetica Neue",serif;
+            font-size: 12px;
+            font-style: oblique;
+            line-height: 0;
+            position: fixed;
+            top: 50px;
+            text-align: right;
+            width: 99%;
+            font-weight: 400 !important;
+        }
+
+        body {
+            background-color: #03164d;
+        }
+
+        *{
+            box-sizing: border-box;
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+        }
+
+        td {
+            width: 33%;
+            align-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        table {
+            width: 100%;
+        }
+
+
+
+        .table-wrapper{
+            margin: 10px 70px 70px;
+            box-shadow: 0px 35px 50px rgba( 0, 0, 0, 0.2 );
+        }
+
+        .fl-table {
+            border-radius: 5px;
+            font-size: 12px;
+            font-weight: normal;
+            border: none;
+            border-collapse: collapse;
+            width: 100%;
+            max-width: 100%;
+            white-space: nowrap;
+            background-color: white;
+        }
+
+        .fl-table td, .fl-table th {
+            text-align: center;
+            padding: 8px;
+        }
+
+        .fl-table td {
+            border-right: 1px solid #f8f8f8;
+            font-size: 12px;
+        }
+
+        .fl-table thead th {
+            color: #ffffff;
+            background: #4FC3A1;
+        }
+
+
+        .fl-table thead th:nth-child(odd) {
+            color: #ffffff;
+            background: #324960;
+        }
+
+        .fl-table tr:nth-child(even) {
+            background: #F8F8F8;
+        }
+
+
+    </style>
+
+
+</head>
+<body onload="onLoadEvent()">
+
+
+
+
+<!-- Importing modules -->
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-analytics.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-storage.js"></script>
+
+
+<!-- Firebase Integration -->
+
+<script src="credentials.js"></script>
+
+<script>
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+    var storage = firebase.storage();
+    var db = firebase.firestore();
+
+
+</script>
+
+
+<script>
+    let listOfNames = ['Ajay Watanakun', 'Book Lailert', 'Darren Cheng', 'Earth Lertkittiamornkul', 'Emmi Muninnimit', 'Farng Bulakul', 'Golf Rojnuckarin', 'Im Somnuke', 'Jamie Cameron', 'Kat Tachaplalert', 'Logic Leephakpreeda', 'Nami Fife', 'Pinn Yaowaratana', 'Pont Eampetcharapong', 'Print Yongsuphamongkol', 'PunPun Kanjanasupat', 'Ryu Prasitsoonthorn', 'Seunghyeon Cho', 'Tsedel Yangchen', 'Unique Chokjrenwanit', 'Adah Tiewtranon', 'Amy Techachokwiwat', 'David Harrison', 'Hammer Visessiriluk', 'Ig Enguthaiwat', 'Jadon Leong', 'Jeen-jeen Meesukkho', 'Jing-jing Meesukkho', 'Kiki Jirapojaphorn', 'Maxx Pongsuthimanus', 'Nina Hanpadung-Dhamma', 'Patrick Sirichanyakul', 'Pete Sevikul', 'Punn Tritruengtassana', 'Thep Youngvanich', 'Un Jing Jang', 'Beam Tharawan', 'Dee Dee Ekthanitphong', 'Diamond Vongnum', 'Fah  Kittipattananon', 'Grace Hanputpakdikul', 'Jason Ngowthammatas', 'Jazz Wang', 'Keen Kongkerd', 'Mind Tungsub', 'Pat Temchareon', 'Patrick Grayhurst', 'Poon Mathurunyanont', 'Proud Jitnoppakhun', 'Punn Chotiprasidhi', 'Sor Rattananon', 'Stanley Chow', 'Tania Akrasanee', 'Tonmai Cheewasutthanon', 'Atom Choochan', 'Ball Pasaanunwut', 'Beam Suwiwatchai', 'Bua Kitipawong', 'Click Poolworaluk', 'Fifa Chai', 'Focus Asavadramronggrid', 'Jessy Yan', 'Khanom Niramitsiriphong', 'Lina Chi', 'Ming Ming Glankwamdee', 'Nick Eamchaimongkol', 'Peach Busapapong', 'Pinto Poonapirat', 'Ploy Sripungwiwat', 'Tae Taechanukulchai', 'Thomas Veysey', 'Yeong-Yuh Lin', 'Alex Narkchaiya', 'Bonus Siriwattakanon', 'Ein Lertnawapan', 'Folk Iamvongnatee', 'Gwen Needham', 'Jiayi Xie', 'Jump Srinualnad', 'Khim Asvaplungprohm', 'Kriti Chawla', 'Lhachen Dorji', 'Mark Laosoonthonsiri', 'Peam Chantarasereekul', 'Phi Ponsumphunsuk', 'Poon Tharincharoen', 'Run Sangarayakul', 'Tata Adisaitham', 'Tun Decharin', 'X Tubtimthongchai', 'Yangyi Udombhornprabha', 'Aung-Pao Watsana', 'Boss Buppanimitr', 'Isaac Akaravongwarit', 'Jamee Jensuriyakun', 'Japan Jensuriyakun', 'Jasmine De Petro', 'Jasmine Sibree', 'Jerry Ongratanaphol', 'Joey Surapakdi', 'Oou Saimala', 'Parm Paepuang', 'Pat Kulphaisaltham', 'Petch Kulphaisaltham', 'Pimm Pramoj', 'Proud Siripakorn', 'Pui Shan Lee', 'Punn Patiparnpreechavud', 'Punpun Vacharavithayakorn', 'Simon Latt', 'Son Nguyen', 'Tin Tin Wongthanaporn']
+    listOfNames.sort()
+    console.log(listOfNames)
+
+    if (firebase === undefined) {
+        alert("A content blocker is detected on your browser, this will cause the form to malfunction. Please disable content blocker before you continue.");
+        document.getElementById("submitID").style.display = "none";
+    }
+
+    function signOut() {
+        firebase.auth().signOut().then(function() {
+            window.location = "./login.html";
+        })
+    }
+</script>
+
+
+
+<!-- UI -->
+
+<h6 align="right" class="rightStatus" id="saveStatus" style="color: white">Changes not saved (Name does not exist)</h6>
+<a align="right" href="#" onclick="loadLiveData()" class="rightStatusUpdate" id="reload" style="color: white">Reload</a>
+<a align="right" href="#" onclick="signOut()" class="rightSignOut" id="signOut" style="color: white">Sign Out</a>
+
+<div style="padding: 5% 10% 5% 10%">
+
+<form style="background-color: #cccccc; padding: 20px 10px 20px 10px; border-radius: 25px" onsubmit="prepare(); return false">
+
+    <h2 class="topTitle">General</h2>
+
+
+    <h4 class="titleWithDescription">Name and Lastname</h4>
+    <h6 class="description">(Matches school email name)</h6>
+
+    <label>
+        <input type="text" onkeydown="checkName()" autocomplete="name" autocapitalize="off" spellcheck="false" class="singleLineBox" id="nameField" required>
+    </label>
+    <h4 id="nameLocked">Name</h4>
+
+    <p></p>
+    <a id="spoilerToggle" class="spoilerToggle" href="#" onclick="toggleHide()" >My name doesn't match school name (?)</a>
+
+    <div id="spoiler">
+        <h4 class="titleWithDescription">Preferred Name</h4>
+        <h6 class="description">If your email name doesn't match the name you would like to be used in the leavers' book, please fill in the preferred name below. Preferred name must contain both your nickname and your last name.</h6>
+        <h6 class="description">Preferred name should be the name that everyone can identify you with.</h6>
+        <label for="preferredName"></label><input type="text" onclick="changeStatus()" onchange="saveLiveData('preferredName')" autocomplete="name" autocapitalize="off" spellcheck="false" class="singleLineBox" id="preferredName">
+    </div>
+
+
+    <script>
+        function onLoadEvent() {
+            document.getElementById("nameLocked").style.display = "none";
+            toggleHide()
+
+            let allElements = document.getElementsByTagName("*");
+            for (let i=0; i< allElements.length; i++) {
+                allElements[i].disabled = true
+            }
+
+            firebase.auth().onAuthStateChanged(function(user) {
+                for (let i=0; i< allElements.length; i++) {
+                    allElements[i].disabled = false
+                }
+                if (user) {
+                    uid = user.uid;
+                    email = user.email;
+                    userData = user;
+                    db.collection("users").doc(uid).get().then(function(doc) {
+                        if (doc.exists) {
+                            db.collection("students").doc(uid).get().then(function(doc) {
+                                if (doc.exists) {
+                                    window.location = "./submitted.html"
+                                }
+                            })
+                            document.getElementById("nameField").value = doc.data()["name"]
+                            checkName()
+                            let allElements = document.getElementsByTagName("*");
+                            if (doc.data()["submitted"] === true) {
+                                for (let i=0; i< allElements.length; i++) {
+                                    let currentElement = allElements[i];
+                                    if (currentElement.nodeName === "SELECT" ) {
+                                        currentElement.disabled = true
+                                    }
+                                }
+                                alert("You have opened the form in edit mode, your votes cannot be changed")
+                            }
+                        } else {
+                            alert("Unable to obtain user data. This may occur if you don't have permission to access the form. If you think this is an error, contact the system admin.")
+                        }
+                    })
+                } else {
+                    window.location = "./login.html"
+                }
+            });
+
+
+        }
+
+
+        function toggleHide() {
+            let x = document.getElementById("spoiler");
+            let y = document.getElementById("spoilerToggle");
+            if (x.style.display === "none") {
+                x.style.display = "block";
+                y.innerText = "- Hide Field -";
+            } else {
+                x.style.display = "none";
+                y.innerText = "My name doesn't match school email name (?)";
+            }
+        }
+    </script>
+
+
+    <h4>Other names(what people call you, comma-separated)</h4>
+
+    <label>
+        <input type="text" onkeydown="fieldEdited('otherName')" autocomplete="off"  autocapitalize="off" spellcheck="false" class="singleLineBox" id="otherName" required>
+    </label>
+
+    <p></p>
+
+    <h4>House</h4>
+    <label for="houseSelector"></label><select class="advSelection" id="houseSelector" onchange="saveSelectionData('houseSelector')" required>
+        <option value="e">-Select One-</option>
+        <option value="B">Byron</option>
+        <option value="So">Sonakul</option>
+        <option value="C">Churchill</option>
+        <option value="N">Nehru</option>
+        <option value="K">Keller</option>
+        <option value="S">Suriyothai</option>
+    </select>
+
+    <h4>Instagram Username</h4>
+    <label>
+        <input type="text" onkeydown="fieldEdited('instagram')" autocomplete="username" autocorrect="off" autocapitalize="off" spellcheck="false" class="singleLineBox" id="instagram" required>
+    </label>
+
+    <p></p>
+
+    <h4>What will you miss the most about Harrow?</h4>
+    <label>
+        <textarea class="multiLineBox" onkeydown="fieldEdited('missText')" rows="4" id="missText" required></textarea>
+    </label>
+
+    <p></p>
+
+
+    <h4>What was your most embarrassing moment?</h4>
+    <label>
+        <textarea class="multiLineBox" onkeydown="fieldEdited('embarrassing')" rows="4" id="embarrassing" required></textarea>
+    </label>
+
+    <p></p>
+
+    <h4>What was your best excuse for not doing homework?</h4>
+    <label>
+        <textarea class="multiLineBox" onkeydown="fieldEdited('excuse')" rows="4" id="excuse" required></textarea>
+    </label>
+
+    <p></p>
+
+    <h4>What will you be most remembered for?</h4>
+    <label>
+        <textarea class="multiLineBox" onkeydown="fieldEdited('remembered')" rows="4" id="remembered" required></textarea>
+    </label>
+
+    <p></p>
+
+    <h4>Where do you see yourself in ten years?</h4>
+    <label>
+        <textarea class="multiLineBox" onkeydown="fieldEdited('tenYears')" rows="4" id="tenYears" required></textarea>
+    </label>
+
+    <p></p>
+
+    <h4>Senior Quote (in English):</h4>
+    <label>
+        <textarea class="multiLineBox" onkeydown="fieldEdited('snrQuote')" rows="4" id="snrQuote" required></textarea>
+    </label>
+
+    <p></p>
+
+    <!-- ImagePicker -->
+
+    <h2>Pictures</h2>
+    <p>Please upload between 3-5 photos, preferably 1 individual and 4 group photos. Supports jpg, png and HEIC.</p>
+    <p>Wait until the status shows "Uploaded" before submitting or leaving the page.</p>
+    <label>
+        <input type="file" name="logo" id="imgPicker" accept="image/jpeg, image/png, image/heic" onchange="filesSelected(this)" multiple>
+    </label>
+
+    <div id="imageTableDiv" class="table-wrapper">
+    </div>
+
+
+
+
+
+    <p></p>
+
+
+    <h2>Most likely to...</h2>
+    <h5>For this section, type after you click the drop down box to search names. Your votes cannot be changed.</h5>
+
+    <p></p>
+
+    <label for="selectOne">be Instagram famous : </label><select class="advSelection" id="selectOne" onchange="saveSelectionData('selectOne')" required>
+        <option value="e">-Select A Name-</option>
+    </select>
+
+    <p></p>
+
+    <label for="selectTwo">get married first : </label><select class="advSelection" id="selectTwo" onchange="saveSelectionData('selectTwo')" required>
+        <option value="e">-Select A Name-</option>
+    </select>
+
+    <p></p>
+
+    <label for="selectThree">travel the world : </label><select class="advSelection" id="selectThree" onchange="saveSelectionData('selectThree')" required>
+        <option value="e">-Select A Name-</option>
+    </select>
+
+    <p></p>
+
+    <label for="selectFour">take over the world : </label><select class="advSelection" id="selectFour" onchange="saveSelectionData('selectFour')" required>
+        <option value="e">-Select A Name-</option>
+    </select>
+
+    <p></p>
+
+    <label for="selectTwelve">skip university classes : </label><select class="advSelection" id="selectTwelve" onchange="saveSelectionData('selectTwelve')" required>
+        <option value="e">-Select A Name-</option>
+    </select>
+
+    <p></p>
+
+    <label for="selectSixteen">become a billionaire (without parents' help) : </label><select class="advSelection" id="selectSixteen" onchange="saveSelectionData('selectSixteen')" required>
+        <option value="e">-Select A Name-</option>
+    </select>
+
+    <p></p>
+
+    <label for="selectSeventeen">get arrested : </label><select class="advSelection" id="selectSeventeen" onchange="saveSelectionData('selectSeventeen')" required>
+        <option value="e">-Select A Name-</option>
+    </select>
+
+    <p></p>
+
+    <label for="selectEighteen">work at KFC : </label><select class="advSelection" id="selectEighteen" onchange="saveSelectionData('selectEighteen')" required>
+        <option value="e">-Select A Name-</option>
+    </select>
+
+
+
+
+    <h2>Superlatives</h2>
+    <h5>For this section, type after you click the drop down box to search names. Your votes cannot be changed.</h5>
+
+    <p></p>
+
+    <label for="selectFive">Best dressed: </label><select class="advSelection" id="selectFive" onchange="saveSelectionData('selectFive')" required>
+        <option value="e">-Select A Name-</option>
+    </select>
+
+    <p></p>
+
+    <label for="selectSix">Best bromance: </label><select class="advSelection" id="selectSix" onchange="saveSelectionData('selectSix')" required>
+        <option value="e">-Select A Name-</option>
+    </select>
+
+    <label for="selectSeven"> and </label><select class="advSelection" id="selectSeven" onchange="saveSelectionData('selectSeven')" required>
+        <option value="e">-Select A Name-</option>
+    </select>
+
+    <p></p>
+
+    <label for="selectEight">Best womance: </label><select class="advSelection" id="selectEight" onchange="saveSelectionData('selectEight')" required>
+        <option value="e">-Select A Name-</option>
+    </select>
+
+    <label for="selectNine"></label> and <select class="advSelection" id="selectNine" onchange="saveSelectionData('selectNine')" required>
+        <option value="e">-Select A Name-</option>
+    </select>
+
+
+    <p></p>
+
+    <label for="selectThirteen">Best couple (High school sweetheart): </label><select class="advSelection" id="selectThirteen" onchange="saveSelectionData('selectThirteen')" required>
+        <option value="e">-Select A Name-</option>
+    </select>
+
+
+    <label for="selectFourteen"> and </label><select class="advSelection" id="selectFourteen" onchange="saveSelectionData('selectFourteen')" required>
+        <option value="e">-Select A Name-</option>
+    </select>
+
+    <p></p>
+
+    <label for="selectTen">Best smile: </label><select class="advSelection" id="selectTen" onchange="saveSelectionData('selectTen')" required>
+        <option value="e">-Select A Name-</option>
+    </select>
+
+    <p></p>
+
+    <label for="selectEleven">Class clown: </label><select class="advSelection" id="selectEleven" onchange="saveSelectionData('selectEleven')" required>
+        <option value="e">-Select A Name-</option>
+    </select>
+
+    <p></p>
+
+    <label for="selectFifteen">Heart-breaker: </label><select class="advSelection" id="selectFifteen" onchange="saveSelectionData('selectFifteen')" required>
+        <option value="e">-Select A Name-</option>
+    </select>
+
+    <p></p>
+
+    <input type="submit" value="Submit" class="submitButton">
+
+</form>
+</div>
+
+
+<script>
+    function addNameOptions(forElement) {
+        let selector = document.getElementById(forElement);
+        for (let i = 0; i < listOfNames.length; i++) {
+            let eachName = listOfNames[i];
+            let el = document.createElement("option");
+            el.textContent = eachName;
+            el.value = eachName;
+            selector.appendChild(el);
+        }
+    }
+
+    addNameOptions("selectOne");
+    addNameOptions("selectTwo");
+    addNameOptions("selectThree");
+    addNameOptions("selectFour");
+    addNameOptions("selectFive");
+    addNameOptions("selectSix");
+    addNameOptions("selectSeven");
+    addNameOptions("selectEight");
+    addNameOptions("selectNine");
+    addNameOptions("selectTen");
+    addNameOptions("selectEleven");
+    addNameOptions("selectTwelve");
+    addNameOptions("selectThirteen");
+    addNameOptions("selectFourteen");
+    addNameOptions("selectFifteen");
+    addNameOptions("selectSixteen");
+    addNameOptions("selectSeventeen");
+    addNameOptions("selectEighteen");
+</script>
+
+
+
+
+<!-- Submission -->
+
+
+
+<h1>
+    <script type="text/javascript">
+
+        let nameField = document.getElementById("nameField");
+        let preferredNameField = document.getElementById("preferredName");
+        let altNameField = document.getElementById("otherName");
+        let igAccField = document.getElementById("instagram");
+
+
+        let missField = document.getElementById("missText");
+        let embarrassingField = document.getElementById("embarrassing");
+        let hwkField = document.getElementById("excuse");
+        let rememberedField = document.getElementById("remembered");
+        let tenYearsField = document.getElementById("tenYears");
+        let quoteField = document.getElementById("snrQuote");
+        let imagePicker = document.getElementById("imgPicker");
+
+        let uid = undefined
+        let email = undefined
+        let userData = undefined
+
+        async function prepare() {
+
+            //Validation Check
+            let name = nameField.value;
+            let nameExists = false;
+
+            if (await nameAlreadyExists()) {
+                nameExists = true;
+                alert("You have already submitted the form, your response will be updated but your votes will not be registered.")
+            }
+
+            if (!listOfNames.map(v => v.toLowerCase()).includes(name.toLowerCase())) {
+                alert("Check that you spelled your name correctly! The name field should match what is shown when others receive your school email (Your name was not recognised)");
+                return
+            }
+
+            let numImages = await numberOfImages()
+
+            if (numImages === 0) {
+                alert("No image available to be submitted. Make sure that your images are uploaded")
+                return
+            }
+
+            if (numImages > 8) {
+                alert("You cannot upload for than 7 images, remove some and submit again.")
+                return
+            }
+
+            let allElements = document.getElementsByTagName("*");
+
+            for (let i=0; i<allElements.length; i++) {
+                let currentElement = allElements[i];
+                if (currentElement.nodeName === "INPUT" || currentElement.nodeName === "TEXTAREA") {
+                    if (currentElement.value === "" && currentElement.id !== "preferredName" && currentElement.id !== "imgPicker") {
+                        console.log(currentElement.id)
+                        await saveLiveData(currentElement.id)
+                        alert("You cannot leave any field empty!");
+                        return
+                    }
+                } else if (currentElement.nodeName === "SELECT") {
+                    if (currentElement.selectedIndex === 0) {
+                        console.log(currentElement.id)
+                        alert("You cannot leave any selection empty!");
+                        return
+                    }
+                }
+            }
+
+            showLoading();
+
+            let updateData = {submitted: true}
+
+
+            db.collection("users").doc(uid).get().then(function(doc) {
+                if (doc.exists) {
+                    console.log(doc.data()["submitted"])
+                    if (doc.data()["submitted"] === false) {
+                        console.log("SAVE VOTES")
+                        db.collection("users").doc(uid).update(updateData).then(function() {
+                            console.log("Marked User as Submitted!");
+                            saveVotes()
+                        }).catch(function(error) {
+                            console.error("Error writing document: ", error);
+                            alert("An error occurred: Unable to mark user as submitted. Your form has not been submitted but was saved. Reload and try again.")
+                        });
+                    } else {
+                        console.log("NOT SAVE VOTES")
+                        saveData()
+                    }
+                }
+            })
+
+
+        }
+
+        async function saveData() {
+            document.getElementById('uploadingMsg').innerHTML = "Saving Data and Placing Votes...";
+
+
+            db.collection("requests").doc("client-students").set({requiresUpdate: true});
+
+            db.collection("working").doc(uid).get().then(function(doc) {
+                if (doc.exists) {
+                    let updateData = doc.data()
+                    updateData["date"] = new Date()
+                    db.collection("students").doc(uid).set({updateData}).then(function() {
+                        console.log("Document successfully written!");
+                        hideLoad()
+                    }).catch(function(error) {
+                        fatalError(error);
+                        console.error("Error writing document: ", error);
+                    });
+                }
+            })
+
+
+        }
+
+        function sortTwoNames(nameOne, nameTwo){
+            let nameArray = [nameOne, nameTwo];
+            let sortedNameArray = nameArray.sort();
+            return sortedNameArray[0] + " + " + sortedNameArray[1]
+        }
+
+        function getValue(element){
+            return document.getElementById(element).options[document.getElementById(element).selectedIndex].value
+        }
+
+        async function saveVotes() {
+            await saveVoteFor("igFamous", getValue("selectOne"));
+            await saveVoteFor("married", getValue("selectTwo"));
+            await saveVoteFor("takeover",  getValue("selectThree"));
+            await saveVoteFor("travelTheWorld",  getValue("selectFour"));
+            await saveVoteFor("bestDressed",  getValue("selectFive"));
+            await saveVoteFor("bestBromance", sortTwoNames(getValue("selectSix"),  getValue("selectSeven")));
+            await saveVoteFor("bestWomance",  sortTwoNames(getValue("selectEight"),  getValue("selectNine")));
+            await saveVoteFor("bestSmile", getValue("selectTen"));
+            await saveVoteFor("classClown", getValue("selectEleven"));
+            await saveVoteFor("skipUni", getValue("selectTwelve"));
+            await saveVoteFor("bestCouple", sortTwoNames(getValue("selectThirteen"),  getValue("selectFourteen")));
+            await saveVoteFor("heartBreaker", getValue("selectFifteen"));
+            await saveVoteFor("billionaire", getValue("selectSixteen"));
+            await saveVoteFor("arrested", getValue("selectSeventeen"));
+            await saveVoteFor("kfc", getValue("selectEighteen"));
+            saveData();
+        }
+
+        async function saveVoteFor(topic, name) {
+            console.log("Saving " + name + " for " + topic);
+            var docRef = db.collection("vote").doc(topic);
+
+            await docRef.get().then(function(doc) {
+                if (doc.exists) {
+                    if (doc.data()[name] === undefined) {
+                        let updateData = {};
+                        updateData[name] = 1;
+                        docRef.set(updateData, { merge: true });
+                    } else {
+                        let updateData = {};
+                        updateData[name] = doc.data()[name] + 1;
+                        docRef.set(updateData, { merge: true });
+                    }
+                } else {
+                    let updateData = {};
+                    updateData[name] = 1;
+                    docRef.set(updateData, { merge: true });
+                }
+            }).catch(function(error) {
+                fatalError(error);
+                console.log("Error getting document:", error);
+            });
+        }
+
+
+        async function nameAlreadyExists() {
+            let value = false
+            await db.collection('students').doc(uid).get().then((docSnapshot) => {
+                if (docSnapshot.exists) {
+                    console.log("Data which suppose to exist")
+                    console.log(docSnapshot.data())
+                    value = true
+                    return true
+                }
+                return false
+            });
+            console.log("AFTER")
+
+        }
+    </script>
+</h1>
+
+
+<!-- Uploading Images -->
+
+<script src="imageManager.js"></script>
+
+
+
+<!-- Live Save -->
+
+<script src="liveDataManager.js"></script>
+
+
+<!-- Advanced UI DONT TOUCH -->
+
+<div id='uploadingMsg' style='display: none;'>Uploading Images... (This may take a some time depending on file size)</div>
+<div id='prepare' style='display: none;'></div>
+
+
+<script>
+    function showLoading() {
+        document.getElementById('prepare').style.display = 'block';
+        document.getElementById('uploadingMsg').style.display = 'block';
+    }
+
+    function hideLoad() {
+        window.location = "./submitted.html"
+    }
+
+    function fatalError(errorValue) {
+        alert("A fatal error occured: " + errorValue.toString() + ". The page will reload automatically.")
+        window.location = "./index.html"
+    }
+</script>
+
+
+<p class="footer" align="right" style="color: white"> Copyright © 2021 Pakkapol Lailert, All Rights Reserved</p>
+<p class="footer" align="right" style="color: white"> Leavers' Book Form, Version: 3.0.2. Release Candidate 4B Published: 12 Mar 2021 0:11 UTC</p>
+
+
+</body>
+</html>

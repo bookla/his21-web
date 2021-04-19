@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Data Submitted</title>
+
+    <link rel="stylesheet" href="grad-style.css">
+    <link rel="stylesheet" href="../common-style.css">
+    <link rel="shortcut icon" type="image/ico" href="https://www.harrowschool.ac.th/uploaded/favicon_Harrow.ico"/>
+
+</head>
+<body onload="setupUI(); signIn()">
+
+<div id="background" style="background-color: #03164d; overflow: auto; position:absolute; top: 0; left: 0; width: 100%; height: 100%"></div>
+
+<a href="#" onclick="signOut()" class="rightSignOut" id="signOut" style="color: white">Sign Out</a>
+
+<div style="width:70%; position: absolute; top: 20px; border-radius: 15px" class="container" id="action-box">
+    <h1 style="width: 100%; text-align: center; color: black" id="main-text">Thank You!</h1>
+    <p id="description-text" style="color: black; text-align: center">Your graduate profile has been received, you will receive a confirmation email shortly. If you do not receive a confirmation within 24 hour or would like to make edits, kindly contact the admin. You may now close this page.</p>
+</div>
+
+</body>
+
+
+<script>
+    let uid = "";
+
+    function setupUI() {
+        let box = document.getElementById("action-box")
+        box.style.left = ((document.getElementsByTagName("body")[0].clientWidth - box.clientWidth)/2 - 2).toString() + "px"
+        box.style.top = ((document.getElementsByTagName("body")[0].clientHeight - box.clientHeight)/2 - 2).toString() + "px"
+    }
+
+    function editClicked() {
+        db.collection("gradRaw").doc(uid).delete().then(function () {
+            window.location = "./form.html"
+        })
+    }
+
+    function signIn() {
+        document.getElementById("edit-button").disabled = true
+        firebase.auth().onAuthStateChanged(function(user) {
+            document.getElementById("edit-button").disabled = false
+            if (user) {
+                uid = user.uid
+                db.collection("gradRaw").doc(uid).get().then(function (doc) {
+                    if (!doc.exists) {
+                        window.location = "./form.html"
+                    }
+                })
+            } else {
+                window.location = "../login.html?fwd=grad_submitted"
+            }
+        })
+    }
+</script>
+
+
+<!-- Importing modules -->
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-analytics.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-auth.js"></script>
+
+
+<!-- Firebase Integration -->
+
+<script src="../credentials.js"></script>
+
+<script>
+    // Your web app's Firebase configuration
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+
+    let db = firebase.firestore();
+</script>
+
+</html>

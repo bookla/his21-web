@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Complete Your Graduate Profile</title>
+
+    <link rel="stylesheet" href="grad-style.css">
+    <link rel="stylesheet" href="../common-style.css">
+    <link rel="shortcut icon" type="image/ico" href="https://www.harrowschool.ac.th/uploaded/favicon_Harrow.ico"/>
+</head>
+<body onload="init()" style="height: 100%">
+
+
+<div style="background-color: #03164d; overflow: auto; position:absolute; top: 0; left: 0; width: 100%" id="background"></div>
+
+<div style="width:70%; position: absolute; top: 20px; border-radius: 15px" class="container" id="action-box">
+    <h2 class="titleWithDescription" id="name">Loading Form....</h2>
+    <h4 class="description">Graduate Profile</h4>
+
+    <div style="padding-top: 15px"></div>
+
+    <h4 class="titleWithDescription">Description</h4>
+    <h6 class="description">Describe yourself: What you're most known for, where you're going, what you like etc. (If you wish you can write this in 3rd person)</h6>
+
+    <label>
+        <textarea class="multiLineBox" rows="4" id="description" required></textarea>
+    </label>
+
+    <h4 class="titleWithDescription">A-Level/AS-Level Subjects</h4>
+    <h6 class="description">e.g. Physics, Mathematics, Economics, Media Studies (AS), EPQ (AS) </h6>
+
+    <label>
+        <input type="text" autocomplete="off" autocapitalize="off" spellcheck="false" class="singleLineBox" id="aLevel" required>
+    </label>
+
+    <h4>Top Choice/Firmed University</h4>
+
+    <label>
+        <input type="text" class="singleLineBox" id="uniName" required>
+    </label>
+
+    <h4>University Course</h4>
+
+    <label>
+        <input type="text" autocomplete="off" autocapitalize="off" spellcheck="false" class="singleLineBox" id="uniCourse" required>
+    </label>
+
+    <h4 class="titleWithDescription">Additional Quote</h4>
+    <h6 class="description">(Optional) Anything else you would like to say</h6>
+
+    <label>
+        <input type="text" autocomplete="off" autocapitalize="off" spellcheck="false" class="singleLineBox" id="O-quote">
+    </label>
+
+    <div style="padding-top: 12px"></div>
+
+    <h4 class="titleWithDescription">Profile Picture</h4>
+    <h6 class="description">WARNING: Images which are not square will be cropped to a square</h6>
+
+    <label>
+        <input type="file" accept="image/jpeg, image/png, image/bmp" onchange="preUploadImage(this)" id="X-IMAGE">
+    </label>
+
+    <a class="description" id="imageStatus" style="color: black; float: left; padding-bottom: 20px; width: 100%">Awaiting Upload</a>
+
+    <div style="padding-top: 12px"></div>
+
+    <h4 class="titleWithDescription">Additional Offers/Acceptances</h4>
+    <h6 class="description">(Optional) If you would like to enter other universities where your application has been successful at, you can enter them here.</h6>
+
+    <a href="#" onclick="addBox()" style="font-size: 12px; color: black; font-weight: normal">Add New +</a>
+
+    <div id="additionalUnis">
+    </div>
+
+    <button onclick="save()" class="submitButton" id="saveID">Save</button>
+    <button onclick="submit()" class="submitButton" id="submitID">Submit</button>
+</div>
+
+<script src="grad-support.js"></script>
+
+<script>
+
+    function load(data) {
+        console.log("Test")
+        console.log(data)
+        for (let i=0; i<Object.keys(data).length; i++) {
+            let field = Object.keys(data)[i]
+            let value = data[field]
+
+            if (field === "additional") {
+                for (let k=0; k<value.length; k++) {
+                    let name = value[k]["name"]
+                    let course = value[k]["course"]
+                    addBox(name, course)
+                }
+            }
+
+            if (field === "img" && value !== "") {
+                document.getElementById("imageStatus").innerText = "Uploaded"
+                document.getElementById("imageStatus").href = value
+                fileURL = value
+            }
+
+
+            let element = document.getElementById(field)
+            if (element) {
+                if (field[0] === "C") {
+                    element.checked = value
+                } else {
+                    element.value = value
+                }
+            }
+        }
+    }
+
+    function preUploadImage(selector) {
+        uploadProfile(document, selector.files[0], uid)
+    }
+
+    function getAdditionalUniversities() {
+        let allAdditional = []
+        for (let i=0; i<additionalUnis.length; i++) {
+            let pair = additionalUnis[i]
+            let uniName = pair[0].value
+            let uniCourse = pair[1].value
+            allAdditional.push({"name": uniName, "course": uniCourse})
+        }
+        return allAdditional
+    }
+
+    function save() {
+        dump(document, "gradRaw", uid, {img: fileURL, additional: getAdditionalUniversities(), "check_manual": false, "check_auto": false}, window, "./form.html")
+    }
+
+    function submit() {
+        if (fileUploading) {
+            alert("Please wait, profile image is still uploading")
+            return
+        }
+        if (!checkFields(document.getElementById("action-box"))) {
+            alert("Please fill all blanks before submitting")
+            return
+        }
+        if (fileURL === undefined || fileURL === "") {
+            alert("Image not uploaded")
+            return
+        }
+        if (uid === undefined) {
+            alert("Session expired. Copy your responses and reload the page")
+            return
+        }
+        dump(document, "gradRaw", uid, {img: fileURL, additional: getAdditionalUniversities(), "check_manual": true, "check_auto": false}, window, "./submitted.html")
+    }
+
+    let additionalUnis = []
+    let uid = ""
+
+    function addBox(uni="", course="", checked=false) {
+        let div = document.createElement("div")
+        div.style.paddingTop = "10px"
+        div.style.paddingBottom = "10px"
+
+        let text = document.createElement("h5")
+        text.innerText = "University " + (additionalUnis.length + 1).toString()
+
+        div.appendChild(text)
+
+        let universityName = document.createElement("input")
+        universityName.type = "text"
+        universityName.className = "singleLineBox"
+        universityName.placeholder = "Name of University"
+        universityName.style.marginBottom = "10px"
+        universityName.id = "X-" + makeImageUID(4)
+        universityName.value = uni
+
+        let universityCourse = document.createElement("input")
+        universityCourse.type = "text"
+        universityCourse.className = "singleLineBox"
+        universityCourse.placeholder = "Name of Course"
+        universityCourse.id = "X-" + makeImageUID(4)
+        universityCourse.value = course
+
+        div.appendChild(universityName)
+        div.appendChild(universityCourse)
+
+        if (additionalUnis.length === 0) {
+            let tickDiv = document.createElement("div")
+
+            let text = document.createElement("p")
+            text.innerText = "Insurance Choice?"
+            text.style.display = "inline"
+            text.style.height = "26px"
+
+            tickDiv.appendChild(text)
+            div.appendChild(tickDiv)
+
+            let tick = document.createElement("input")
+            tick.setAttribute("type", "checkbox")
+            tick.checked = checked
+            tick.id = "C-checkbox"
+            tick.style.display = "inline"
+            tick.style.height = "26px"
+            tick.onchange = function (event) {
+                if (tick.checked) {
+                    tick.value = "YES"
+                } else {
+                    tick.value = "NO"
+                }
+            }
+
+
+            tickDiv.appendChild(tick)
+        }
+
+        additionalUnis.push([universityName, universityCourse])
+
+        document.getElementById("additionalUnis").appendChild(div)
+
+        setupUI()
+    }
+
+
+    function setupUI() {
+        let actionBox = document.getElementById("action-box")
+        actionBox.style.height = "auto"
+        actionBox.style.left = ((document.getElementsByTagName("body")[0].clientWidth - document.getElementById("action-box").clientWidth)/2 - 2).toString() + "px"
+        console.log((document.getElementsByTagName("body")[0].clientWidth - document.getElementById("action-box").clientWidth)/2 - 2)
+
+        let background = document.getElementById("background")
+        let bodyHeight = document.getElementsByTagName("body")[0].clientHeight
+        let actionHeight = document.getElementById("action-box").clientHeight + 40
+        if (bodyHeight > actionHeight) {
+            background.style.height = (bodyHeight).toString() + "px"
+        } else {
+            background.style.height = (actionHeight).toString() + "px"
+        }
+    }
+
+    function init() {
+        signIn()
+        window.addEventListener("resize", setupUI);
+        setupUI()
+    }
+
+    function signIn() {
+        console.log("TEST")
+        document.getElementById("submitID").disabled = true
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                uid = user.uid
+                getName(uid)
+                db.collection("gradRaw").doc(uid).get().then(function (doc) {
+                    if (doc.exists) {
+                        if (doc.data()["check_auto"] === false && doc.data()["check_manual"] === false) {
+                            load(doc.data())
+                            document.getElementById("submitID").disabled = false
+                        } else {
+                            console.log("NOT FALSE")
+                            window.location = "./submitted.html"
+                        }
+                    } else {
+                        document.getElementById("submitID").disabled = false
+                    }
+                })
+            } else {
+                window.location = "../login.html?fwd=grad_form"
+            }
+        })
+    }
+
+    function getName(uid) {
+        db.collection("users").doc(uid).get().then(function (doc) {
+            if (doc.exists) {
+                let data = doc.data()
+                document.getElementById("name").innerText = data["name"]
+            } else {
+                alert("User not found")
+            }
+        })
+    }
+</script>
+
+
+<!-- Importing modules -->
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-analytics.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-storage.js"></script>
+
+
+<!-- Firebase Integration -->
+
+<script src="../credentials.js"></script>
+
+<script>
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+
+    let storage = firebase.storage();
+    let db = firebase.firestore();
+</script>
+
+
+</body>
+</html>

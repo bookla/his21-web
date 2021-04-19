@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Register Image Library</title>
+    <link rel="shortcut icon" type="image/ico" href="https://www.harrowschool.ac.th/uploaded/favicon_Harrow.ico"/>
+
+    <link rel="stylesheet" href="../common-style.css">
+
+</head>
+<body onload="init(); setupUI()">
+
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-analytics.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-auth.js"></script>
+
+<script src="../credentials.js"></script>
+
+<script>
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+    var db = firebase.firestore();
+</script>
+
+<div class="background"></div>
+
+<div style="position: absolute; top: 50%; left: 50%; align-content: center;" class="container" id="action-box">
+    <p>Please use this form to indicate if you would like to include a QR code linking to your personal photo gallery in the leavers' book</p>
+    <a href="upload.html">Edit your photo library here</a>
+
+    <br>
+
+    <div style="height: 20px"></div>
+
+    <input type="radio" id="yes" name="age" value="true" style="width: 13px" onclick="setPreference(true)">
+    <label for="yes">Yes please include the QR code in my Leavers' Book Page</label><br>
+    <input type="radio" id="no" name="age" value="false" style="width: 13px" onclick="setPreference(false)">
+    <label for="no">No please do not include the QR code.</label><br>
+
+    <p style="margin-bottom: 0">Logged in as:</p>
+    <p id="email" style="margin-top: 3px"></p>
+</div>
+
+
+<script>
+    const screenHeight = window.screen.height
+    const screenWidth = window.screen.width
+    const smallestSize = (screenHeight > screenWidth) ? screenWidth : screenHeight
+    const boxWidthRelative = 0.7
+
+    function setupUI() {
+        let actionBox = document.getElementById("action-box")
+        const boxWidth = smallestSize*boxWidthRelative
+        actionBox.style.height = "auto"
+        const boxHeight = actionBox.clientHeight
+        actionBox.style.width = boxWidth.toString() + "px"
+        actionBox.style.margin = "-" + (boxHeight/2).toString() + "px 0 0 -" + (boxWidth/2).toString() + "px"
+        actionBox.style.borderRadius = "5px"
+    }
+</script>
+
+<script>
+    let uid = ""
+
+    function init() {
+        document.getElementById("yes").disabled = true
+        document.getElementById("no").disabled = true
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                document.getElementById("email").innerText = user.email
+                uid = user.uid
+                document.getElementById("yes").disabled = false
+                document.getElementById("no").disabled = false
+
+                db.collection("users").doc(uid).get().then(function (doc) {
+                    if (doc.exists) {
+                        let data = doc.data()
+
+                        if (data["qr"]) {
+                            document.getElementById("yes").checked = true
+                        } else {
+                            document.getElementById("no").checked = true
+                        }
+                    }
+                })
+            } else {
+                window.location = "../login.html?fwd=images_register"
+            }
+        })
+    }
+
+    function setPreference(bool) {
+        db.collection("users").doc(uid).update({qr: bool}).then(function () {
+            alert("Saved. You may now close this page.")
+        })
+    }
+</script>
+
+</body>
+</html>

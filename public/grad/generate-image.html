@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Profile Image Download</title>
+
+    <style>
+        @font-face {
+            font-family: Yeseva-One;
+            src: url('fonts/YesevaOne-Regular.ttf');
+        }
+        @font-face {
+            font-family: Lustria;
+            src: url('fonts/Lustria-Regular.ttf');
+        }
+    </style>
+</head>
+<body onload="onLoad()">
+
+<div id="main" style="position: absolute; top: 0; width: 1080px; height: 1080px">
+    <img src="media/HISgrad21.png" style="position: absolute; left: 100px; top: 0; width: 1080px; height: 1080px" alt="background">
+    <div id="white" style="position: absolute; left: 615px; top: 332px; width: 502px; height: 497px; background-color: white"></div>
+    <div id="house-colour" style="position: absolute; left: 628px; top: 332px; width: 494px; height: 471px; background-color: #4CAF50"></div>
+    <img id="profile-picture" src="media/logo.JPG" style="position: absolute; left:611px; top: 290px; width: 488px; height: 488px" alt="profile picture">
+    <h1 id="name" style="position: absolute; left: 180px; top:100px; width: 1000px; text-align: left; font-size: 45pt; font-family: Yeseva-One,serif; color: rgba(6,6,68,0.65)">{user.name()}</h1>
+    <h2 id="university-course" style="position: absolute; padding-left: 20px; left: 120px; top: 800px; width: 390px; text-align: left; font-size: 34pt; font-family: Lustria,serif; color: white; line-height: 60px; font-weight: lighter;">{user.university}</h2>
+    <img id="university-image" src="media/university-logo-templates.png" style="position: absolute; left:710px; top: 850px; width: 387px; height: 213px; object-fit: contain; object-position: right" alt="universityImage">
+</div>
+
+<a id="switch-mode" href="#" onclick="getAlt()" style="position: absolute; right: 20px; top: 20px">Loading...</a>
+
+<script src="../bower_components/dom-to-image/src/dom-to-image.js"></script>
+<script src="grad-support.js"></script>
+
+<script>
+
+    let alt = false
+    let uid = ""
+
+    function getAlt() {
+        alt = !alt
+        loadFromID(uid)
+    }
+
+    function onLoad() {
+        let param = getJsonFromUrl()
+        if (param["uid"]) {
+            loadFromID(param["uid"])
+            uid = param["uid"]
+        } else {
+            alert("UID Not Provided")
+            window.location = "index.html"
+        }
+    }
+
+    function getColour(house) {
+        console.log(house)
+        switch (house) {
+            case "So":
+                return "rgb(255,163,0)";
+            case "S":
+                return "rgb(139,9,162)";
+            case "N":
+                return "rgb(228,11,10)";
+            case "B":
+                return "rgb(21,131,28)";
+            case "C":
+                return "rgb(1,167,172)";
+            case "K":
+                return "rgb(244,219,79)";
+            default:
+                return "rgba(6,6,68,0.65)";
+        }
+    }
+
+    function loadFromID(uid) {
+        db.collection("gradData").doc(uid).get().then(async function (doc) {
+            if (doc.exists) {
+                let data = doc.data()
+
+                let name = data["name"]
+
+                document.getElementById("name").innerText = name
+
+                if (name.length > 20) {
+                    document.getElementById("name").style.fontSize = "38pt"
+                }
+
+                if (name.length > 21) {
+                    document.getElementById("name").style.fontSize = "37pt"
+                }
+
+                let courseName = undefined
+
+                if (alt) {
+                    courseName = data["otherUnis"][0]["courseName"].toUpperCase()
+                } else {
+                    courseName = data["courseName"].toUpperCase()
+                }
+
+                document.getElementById("university-course").innerText = courseName
+
+                document.getElementById("profile-picture").src = data["img"]
+
+                if (courseName.length < 13) {
+                    document.getElementById("university-course").style.fontSize = "40pt"
+                }
+                if (courseName.length <= 7) {
+                    document.getElementById("university-course").style.fontSize = "55pt"
+                }
+
+                document.getElementById("university-course").style.paddingTop = "0px"
+
+                document.getElementById("university-course").style.paddingTop = (120 - document.getElementById("university-course").clientHeight).toString() + "px"
+
+                if ((data["C-checkbox"] === "YES" || data["C-checkbox"] === true) && !alt) {
+                    document.getElementById("switch-mode").innerText = "Switch to Insurance"
+                } else if (data["C-checkbox"] === "YES" || data["C-checkbox"] === true) {
+                    document.getElementById("switch-mode").innerText = "Switch to Firm"
+                } else {
+                    document.getElementById("switch-mode").innerText = ""
+                }
+
+                let universityID = undefined
+                if (alt) {
+                    universityID = data["otherUnis"][0]["universityID"]
+                } else {
+                    universityID = data["universityID"]
+                }
+
+                let uni = await db.collection("gradUni").doc(universityID).get()
+                if (!uni.exists) {
+                    alert("Unknown University")
+                    return
+                }
+                let uniData = uni.data()
+
+                document.getElementById("university-image").src = uniData["img"]
+
+                let user = await db.collection("students").doc(uid).get()
+                if (!user.exists) {
+                    alert("Can't get house colour!")
+                    return
+                }
+                let userData = user.data()
+
+                document.getElementById("house-colour").style.backgroundColor = getColour(userData["updateData"]["selection"]["houseSelector"])
+
+                //getImage()
+            } else {
+                alert("Requested User Profile Does Not Exist!")
+                window.location = "index.html"
+            }
+        })
+    }
+
+    function getImage() {
+        let node = document.getElementById('main');
+
+        domtoimage.toPng(node)
+            .then(function (dataUrl) {
+                downloadURI(dataUrl, "Download")
+                document.body.appendChild(img);
+            })
+            .catch(function (error) {
+                console.error('oops, something went wrong!', error);
+            });
+    }
+
+    function downloadURI(uri, name) {
+        let link = document.createElement("a");
+        link.download = name;
+        link.href = uri;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        delete link;
+    }
+
+
+</script>
+
+
+<!-- Importing modules -->
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-analytics.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-firestore.js"></script>
+
+
+<!-- Firebase Integration -->
+
+<script src="../credentials.js"></script>
+
+<script>
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+
+    let db = firebase.firestore();
+</script>
+
+</body>
+</html>

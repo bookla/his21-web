@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>View Images</title>
+    <link rel="shortcut icon" type="image/ico" href="https://www.harrowschool.ac.th/uploaded/favicon_Harrow.ico"/>
+
+    <style type="text/css">
+        html, body {
+            font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+            overflow: auto;
+            height: 100%;
+            margin: -10px;
+        }
+
+        .bg {
+            background-image: conic-gradient(hsl(116, 0%, 72%),hsl(116, 0%, 72%));
+
+            /* Full height */
+            !important height: 100%;
+            width: 100%;
+
+            /* Center and scale the image nicely */
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+
+            position: static;
+        }
+
+        a {
+            color: #FFF;
+        }
+        a:hover {
+            color: yellow;
+            text-decoration: underline;
+        }
+        .thumbnails img {
+            height: 140px;
+            border: 2px solid #ffffff;
+            padding: 1px;
+            margin: 0 10px 10px 0;
+        }
+
+        .thumbnails img:hover {
+            border: 4px solid #ffffff;
+            cursor:pointer;
+        }
+
+        .preview img {
+            border: 2px solid #ffffff;
+            padding: 1px;
+            width: 800px;
+        }
+
+        .modal {
+            display: none; /* Hidden by default */
+            position: fixed; /* Stay in place */
+            z-index: 1; /* Sit on top */
+            padding-top: 100px; /* Location of the box */
+            left: 0;
+            top: 0;
+            width: 100%; /* Full width */
+            height: 100%; /* Full height */
+            overflow: auto; /* Enable scroll if needed */
+            background-color: rgb(0,0,0); /* Fallback color */
+            background-color: rgba(0,0,0,0.9); /* Black w/ opacity */
+        }
+
+        .modal-content {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+        }
+
+
+        .modal-content {
+            animation-name: zoom;
+            animation-duration: 0.6s;
+        }
+
+        @keyframes zoom {
+            from {transform:scale(0)}
+            to {transform:scale(1)}
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #bbb;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        @media only screen and (max-width: 700px){
+            .modal-content {
+                width: 100%;
+            }
+        }
+
+    </style>
+
+</head>
+<body onload="init()">
+
+<div class="bg" id="bg">
+    <div class="gallery" align="center" style="background: rgba(180,178,178,0.65); height: 100%">
+        <div id="blur" style="opacity: 75%; background: #e8e6e5">
+            <h2 id="pageTitle" style="text-align: left; padding-left: 40px; padding-top: 20px; margin-bottom: 0; font-weight: bold">Photo Gallery</h2>
+            <p id="pageDescription" style="text-align: left; padding-left: 40px; margin-top: 5px; font-style: normal; font-weight: lighter; padding-bottom: 10px">Loading Photo Gallery....</p>
+        </div>
+
+        <div class="thumbnails" id="gallery" style="padding-left: 30px">
+        </div>
+
+    </div>
+</div>
+
+<div id="imageView" class="modal" onclick="closeImageView()">
+
+    <span class="close" onclick="closeImageView()">&times;</span>
+
+    <img class="modal-content" id="enlargedImage" alt="Enlarged Image" src="">
+
+    <div align="center">
+        <p id="caption" style="max-width: 40%; max-height: 20%; text-align: center; color: white">Image Caption</p>
+    </div>
+
+
+</div>
+
+
+
+<!-- Importing modules -->
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-analytics.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-storage.js"></script>
+
+
+<!-- Firebase Integration -->
+
+<script src="../credentials.js"></script>
+
+<script>
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+
+    let storage = firebase.storage();
+    let db = firebase.firestore();
+</script>
+
+<script>
+    function getJsonFromUrl(url) {
+        if(!url) url = location.search;
+        let query = url.substr(1);
+        let result = {};
+        query.split("&").forEach(function(part) {
+            let item = part.split("=");
+            result[item[0]] = decodeURIComponent(item[1]);
+        });
+        return result;
+    }
+
+    function closeImageView() {
+        document.getElementById("imageView").style.display = "none";
+    }
+
+    function adjustUI() {
+        document.getElementById("bg").style.height = document.getElementsByTagName('body')[0].clientHeight.toString() + "px"
+    }
+
+    function init() {
+        adjustUI()
+        window.addEventListener('resize', adjustUI);
+
+
+        let param = getJsonFromUrl()
+        if (param["uid"]) {
+            loadFromID(param["uid"])
+        } else {
+            window.location = "./index.html"
+        }
+    }
+
+    function loadFromID(uid) {
+        db.collection("users").doc(uid).get().then(function(userDoc) {
+            if (userDoc.exists) {
+                let data = userDoc.data()
+                document.getElementById("pageTitle").innerText = data["name"]
+                document.title = data["name"] + "'s Photo Gallery"
+            }
+        })
+        db.collection("personalPage").doc(uid).get().then(function(doc) {
+            if (doc.exists) {
+                let data = doc.data()
+                document.getElementById("pageDescription").innerText = data["profileDescription"]
+
+                let images = data["images"]
+                if (images) {
+                    let captions = data["captions"]
+                    if (!captions) {
+                        captions = {}
+                    }
+                    document.getElementById("gallery").innerHTML = ""
+                    drawImages(images, captions)
+                }
+
+                if (data["background"]) {
+                    console.log("Attempting to load new background image")
+                    console.log(data["background"])
+                    document.getElementById("bg").style.backgroundImage = "url(" + data["background"] + ")"
+                    console.log(document.getElementById("bg").style.backgroundImage)
+                } else {
+                    document.getElementById("bg").style.backgroundImage = "url('./images/default-background.jpg')"
+                }
+            } else {
+                alert("The page for the user that you requested does not exist!")
+                window.location = "./index.html"
+            }
+        })
+    }
+
+    function drawImages(images, captions) {
+        images.forEach(function (image) {
+            let imageItem = document.createElement("img")
+            imageItem.onclick = function (event) {
+                document.getElementById("imageView").style.display = "block";
+                document.getElementById("enlargedImage").src = this.src;
+                document.getElementById("caption").innerText = this.alt;
+            }
+
+            imageItem.src = image
+
+            let caption = captions[image]
+            if (caption) {
+                imageItem.alt = caption
+                console.log(caption)
+            }
+
+            document.getElementById("gallery").appendChild(imageItem)
+        })
+    }
+
+</script>
+
+
+</body>
+</html>

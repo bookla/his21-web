@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Response Statistics</title>
+    <link rel="shortcut icon" type="image/ico" href="https://www.harrowschool.ac.th/uploaded/favicon_Harrow.ico"/>
+
+    <style>
+        html *
+        {
+            color: #000;
+            font-family: sans-serif; !important;
+        }
+    </style>
+
+    <link rel="stylesheet" href="table-style.css">
+</head>
+<body onload="init()">
+    <h4 id="updateTime">Last Updated: None</h4>
+
+    <div class="table-wrapper">
+        <table id="data_table" class="fl-table">
+        </table>
+    </div>
+
+
+    <script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-firestore.js"></script>
+
+    <script src="credentials.js"></script>
+
+    <script>
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        let db = firebase.firestore();
+    </script>
+
+    <script>
+        let vote_title = {"selectOne": "Instagram Famous", "selectTwo": "First to get married", "selectThree": "Take over the world", "selectFour": "Travel the world", "selectFive": "Best Dressed", "selectSix": "Bromance 1", "selectSeven": "Bromance 2", "selectEight": "Womance 1", "selectNine": "Womance 2", "selectTen": "Best Smile", "selectEleven": "Class Clown", "selectTwelve": "Skip University", "selectThirteen": "Couple 1", "selectFourteen": "Couple 2", "selectFifteen": "Heartbreaker", "selectSixteen": "Billionaire", "selectSeventeen": "Get Arrested", "selectEighteen": "KFC", "houseSelector": "House"}
+
+        function element(type, innerText) {
+            let a = document.createElement(type)
+            a.innerText = innerText
+            return a
+        }
+
+        function voteTitle(code) {
+            return vote_title[code]
+        }
+
+        function createUserRow(data, n) {
+            let currentRow = document.createElement("tr")
+            currentRow.style.textAlign = "center"
+
+            currentRow.appendChild(element("td", n))
+            currentRow.appendChild(element("td", data[0]))
+            currentRow.appendChild(element("td", data[1]["uid"]))
+            currentRow.appendChild(element("td", data[1]["status"]))
+            if (data[1].hasOwnProperty("date")) {
+                currentRow.appendChild(element("td", data[1]["date"]))
+            } else {
+                currentRow.appendChild(element("td", "N/A"))
+            }
+            if (data[1]["qr"]) {
+                let elem = document.createElement("a")
+                elem.href = "https://prom.plailert.dev/images/view.html?uid=" + data[1]["uid"]
+                elem.innerText = "Yes"
+                elem.style.verticalAlign = "middle"
+                currentRow.appendChild(elem)
+            } else {
+                currentRow.appendChild(element("td", "No"))
+            }
+            return currentRow
+        }
+
+        function createVoteTable(voteName, voteData) {
+            console.log(voteData)
+            console.log(voteName)
+
+            document.body.appendChild(element("h2", voteTitle(voteName)))
+
+            let table = document.createElement("table")
+
+            let items = Object.keys(voteData).map(function(key) {
+                return [key, voteData[key]];
+            });
+
+            items.sort(function(first, second) {
+                return second[0] > first[0];
+            });
+
+            items.sort(function(first, second) {
+                return second[1] > first[1];
+            });
+
+            for (let i = 0; i < items.length; i++) {
+                let row = document.createElement("tr")
+                if (items[i][0] === "e") {
+                    continue
+                }
+                row.appendChild(element("td", items[i][0]))
+                row.appendChild(element("td", items[i][1]))
+                table.appendChild(row)
+            }
+
+            document.body.appendChild(table)
+        }
+
+
+        function init() {
+            let headerRow = document.createElement("tr")
+            headerRow.appendChild(element("th", "No."))
+            headerRow.appendChild(element("th", "Name"))
+            headerRow.appendChild(element("th", "ID"))
+            headerRow.appendChild(element("th", "Status"))
+            headerRow.appendChild(element("th", "Last Edited"))
+            headerRow.appendChild(element("th", "Include QR"))
+            document.getElementById("data_table").appendChild(headerRow)
+
+            console.log("Data Init")
+
+            db.collection("stats").doc("users").get().then((docSnapshot) => {
+                if (docSnapshot.exists) {
+                    let dict = docSnapshot.data()
+                    console.log(dict)
+                    let items = Object.keys(dict).map(function(key) {
+                        return [key, dict[key]];
+                    });
+
+                    items.sort(function(first, second) {
+                        return second[0] < first[0];
+                    });
+
+                    items.sort(function(first, second) {
+                        return second[1]["dateRaw"] < first[1]["dateRaw"];
+                    });
+
+                    items.sort(function(first, second) {
+                        return second[1]["status"] > first[1]["status"];
+                    });
+
+                    console.log(items)
+
+
+                    for (let i = 0; i < items.length; i++) {
+                        document.getElementById("data_table").appendChild(createUserRow(items[i], i + 1))
+                    }
+
+                }
+            });
+
+            db.collection("stats").doc("data").get().then((docSnapshot) => {
+                if (docSnapshot.exists) {
+                    let data = docSnapshot.data()
+                    document.getElementById("updateTime").innerText = "Last Updated: " + data["date"].toDate().toLocaleString()
+                }
+            })
+
+            db.collection("stats").doc("votes").get().then((docSnapshot) => {
+                console.log(docSnapshot)
+                if (docSnapshot.exists) {
+                    let data = docSnapshot.data()
+
+                    console.log(data)
+
+                    let items2 = Object.keys(vote_title).map(function(key) {
+                        return [key, data[key]];
+                    });
+
+
+                    items2.sort(function(first, second) {
+                        return second[1] < first[1];
+                    });
+
+
+                    for (let i = 0; i < items2.length; i++) {
+                        console.log(items2[i][0])
+                        console.log(data)
+                        createVoteTable(items2[i][0], data[items2[i][0]])
+                    }
+                }
+            });
+        }
+
+    </script>
+</body>
+</html>

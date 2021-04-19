@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Form Submitted</title>
+
+    <link rel="stylesheet" href="common-style.css">
+    <link rel="shortcut icon" type="image/ico" href="https://www.harrowschool.ac.th/uploaded/favicon_Harrow.ico"/>
+
+    <style>
+        .rightSignOut {
+            font-family: "Helvetica Neue",serif;
+            font-size: 12px;
+            font-style: oblique;
+            line-height: 0;
+            position: fixed;
+            top: 10px;
+            text-align: right;
+            width: 99%;
+            font-weight: 400 !important;
+        }
+    </style>
+</head>
+<body onload="setupUI(); onLoadEvent()">
+
+    <div class="background"></div>
+
+    <a href="#" onclick="signOut()" class="rightSignOut" id="signOut" style="color: white">Sign Out</a>
+
+    <div style="position: absolute; top: 50%; left: 50%; align-content: center;" class="container" id="action-box">
+        <h1 style="width: 100%; text-align: center; color: black" id="main-text">Thank You!</h1>
+        <p id="description-text" style="color: black">We have received your response! We will contact you if there's a problem with your response. If you wish to update your response, you may do so by clicking edit below. You may now close this tab.</p>
+
+        <button id="login-button" onclick="editClicked()" style="width: 100%; height: 40px; margin-top: 20px; border-radius: 10px; border-width: 0; box-shadow: lightgray; padding-right: 10px; background-color: white; font-size: 20px" class="deactivatedButton">Edit</button>
+    </div>
+
+    <!-- Firebase Integration -->
+
+    <script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-analytics.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-auth.js"></script>
+
+    <script src="credentials.js"></script>
+
+    <script>
+        // Your web app's Firebase configuration
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        firebase.analytics();
+        var db = firebase.firestore();
+
+
+    </script>
+
+    <script>
+
+        uid = undefined
+
+        function signOut() {
+            firebase.auth().signOut().then(function() {
+                window.location = "./login.html?fwd=submitted";
+            })
+        }
+
+        function editClicked() {
+            if (confirm("If you put your form into edit mode, your form will be removed from the system and you will need to click submit again to save your edit. Your previous response will be restored but you will not be able to edit votes. Click [OK] to enter edit mode.")) {
+                db.collection("requests").doc("client-students").set({requiresUpdate: true});
+                db.collection("students").doc(uid).delete().then(function() {
+                    console.log("Document successfully deleted!");
+                    window.location = "./form.html"
+                }).catch(function(error) {
+                    alert("Unable to enter edit mode!");
+                    window.location = "./index.html"
+                });
+            }
+        }
+
+
+        function onLoadEvent() {
+            firebase.auth().onAuthStateChanged(function(user) {
+                if (user) {
+                    uid = user.uid;
+                    email = user.email;
+                    userData = user;
+                    db.collection("users").doc(uid).get().then(function(doc) {
+                        if (doc.exists) {
+                            db.collection("students").doc(uid).get().then(function(doc) {
+                                if (doc.exists === false) {
+                                    window.location = "./form.html"
+                                }
+                            })
+                        }
+                    })
+                } else {
+                    window.location = "./login.html?fwd=submitted"
+                }
+            });
+        }
+
+    </script>
+
+    <script>
+        const screenHeight = window.screen.height
+        const screenWidth = window.screen.width
+        const smallestSize = (screenHeight > screenWidth) ? screenWidth : screenHeight
+        const boxWidthRelative = 0.7
+
+        function setupUI() {
+            let actionBox = document.getElementById("action-box")
+            const boxWidth = smallestSize*boxWidthRelative
+            actionBox.style.height = "auto"
+            const boxHeight = actionBox.clientHeight
+            actionBox.style.width = boxWidth.toString() + "px"
+            actionBox.style.margin = "-" + (boxHeight/2).toString() + "px 0 0 -" + (boxWidth/2).toString() + "px"
+            actionBox.style.borderRadius = "5px"
+        }
+    </script>
+
+
+</body>
+</html>

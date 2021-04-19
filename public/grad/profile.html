@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>HIS21 Graduate Profile</title>
+
+    <link rel="stylesheet" href="grad-style.css">
+    <link rel="shortcut icon" type="image/ico" href="https://www.harrowschool.ac.th/uploaded/favicon_Harrow.ico"/>
+</head>
+<body onload="init()" style="height: 100%; overflow-x: hidden">
+
+<div class="image-background" id="background-image" style="padding-left: 20px">
+    <a style="position: absolute; right: 20px; top: 20px; color: black" href="#" onclick="generateImage()">Generate Profile Image</a>
+    <div id="profileVertical" style="width:100%"></div>
+    <div class="blur-div" id="main-div" align="center" style="overflow: hidden">
+        <div style="float: left; width: 20%; align-content: center" id="profImgDiv">
+            <img class="profImg" src="media/logo.JPG" alt="Profile Picture" id="profImg" style="border-radius: 10%">
+        </div>
+        <div style="width: 79%; float: right; padding-top: 50px;" id="infoDiv">
+            <div style="height: 64%; overflow: auto;">
+                <h1 style="width: 100%; text-align: left; margin-top: 0; text-size-adjust: none; -webkit-text-size-adjust:none; font-size: 30pt" id="name">NAME LASTNAME</h1>
+                <p style="padding-right: 10%; text-align: justify; text-size-adjust: none; -webkit-text-size-adjust:none; font-size: 20pt" id="description">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+            </div>
+            <h1 style="font-size: 26pt; padding-right: 20px; text-size-adjust: none; -webkit-text-size-adjust:none; text-align: left" id="quote">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Facilisis sed odio morbi quis commodo odio. Eu volutpat odio facilisis mauris.</h1>
+            <div class="uniDiv" id="uniDiv" style="margin-bottom: 20px">
+                <img src="media/no-image.jpg" alt="University Logo" style="width: 40%; max-height: 100%; height:5px; float: left; border-radius: 5px; background-color: #FFFFFF; object-fit: contain" id="uniImg">
+                <div class="uniText" id="uniText">
+                    <h3 class="uniName" id="uniName" style="text-size-adjust: none; -webkit-text-size-adjust:none;">University of ______</h3>
+                    <p class="courseName" id="courseName" style="text-size-adjust: none; -webkit-text-size-adjust:none;">To Study: _________</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="blur-div" id="other-unis" style="padding-left:30px; margin-top: -19px; font-size: 26pt">
+        <h3 style="padding-top: 10px; padding-top: 40px">Other Offers/Acceptances</h3>
+    </div>
+</div>
+
+<script src="grad-support.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-analytics.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-storage.js"></script>
+
+<script src="../credentials.js"></script>
+
+<script>
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+
+    let storage = firebase.storage();
+    let db = firebase.firestore();
+</script>
+
+<script>
+
+    let otherUnis = []
+    let vertical = false
+    let uid = ""
+
+    function generateImage() {
+        if (uid !== "") {
+            window.location = "generate-image.html" + "?uid=" + uid
+        }
+    }
+
+    function init() {
+        changeBackgroundImage("media/default-background.jpg", "background-image", document)
+        window.addEventListener("resize", adjustUI);
+        adjustUI()
+        //test()
+
+        let param = getJsonFromUrl()
+        if (param["uid"]) {
+            uid = param["uid"]
+            loadFromID(param["uid"])
+        } else {
+            //TODO: Redirect to index
+            //window.location = "./index.html"
+            uid = "G6LBqFqMcvSFvUMnVXFFwABtbew2"
+            loadFromID("G6LBqFqMcvSFvUMnVXFFwABtbew2")
+        }
+    }
+
+    function getUniversity(uniID, nameID, imgID) {
+        db.collection("gradUni").doc(uniID).get().then(function(userDoc) {
+            if (userDoc.exists) {
+                let data = userDoc.data()
+                elem(nameID).innerText = data["name"]
+                if (imgID !== undefined) {
+                    if (data["img"] !== "") {
+                        elem(imgID).src = data["img"]
+                    } else {
+                        elem(imgID).src = "media/no-image.jpg"
+                    }
+                }
+                adjustUI()
+            } else {
+                console.log("Can't find university with id" + uniID.toString())
+            }
+        })
+    }
+
+    function getOtherUniversity(uniID, course) {
+        db.collection("gradUni").doc(uniID).get().then(function(userDoc) {
+            if (userDoc.exists) {
+                let data = userDoc.data()
+
+                let img = data["img"]
+
+                if (img === "" || img === undefined) {
+                    img = "media/no-image.jpg"
+                }
+
+                otherUnis.push([data["name"], course, img])
+
+                addUniversity(data["name"], course, img)
+                adjustUI()
+            } else {
+                console.log("Can't find university with id" + uniID.toString())
+            }
+        })
+    }
+
+    let profURL = ""
+
+    function loadFromID(uid) {
+        db.collection("gradData").doc(uid).get().then(function(userDoc) {
+            if (userDoc.exists) {
+                let data = userDoc.data()
+                document.title = data["name"] + "'s Graduate Profile"
+
+                elem("name").innerText = data["name"]
+                elem("description").innerText = data["description"]
+                profURL = data["img"]
+                if (!vertical) {
+                    elem("profImg").src = data["img"]
+                } else {
+                    elem("profileVertical").src = data["img"]
+                }
+
+                if (data.hasOwnProperty("quote")) {
+                    if (data["quote"] !== "") {
+                        elem("quote").innerText = "\"" + data["quote"] + "\""
+                    } else {
+                        elem("quote").innerText = ""
+                    }
+                } else {
+                    elem("quote").innerText = ""
+                }
+
+                elem("courseName").innerText = data["courseName"]
+                getUniversity(data["universityID"], "uniName", "uniImg")
+
+                let otherUnis = data["otherUnis"]
+                if (otherUnis.length === 0) {
+                    elem("other-unis").innerHTML = ""
+                    elem("other-unis").hidden = true
+                }
+                otherUnis.forEach(function(uniData) {
+                    getOtherUniversity(uniData["universityID"], uniData["courseName"])
+                })
+                adjustUI()
+            } else {
+                alert("The person you requested has not completed their personal page yet!")
+            }
+        })
+    }
+
+    function adjustUI() {
+        let body = document.getElementsByTagName('body')[0]
+
+        console.log(body.clientWidth.toString() + " " + body.clientHeight.toString())
+
+        if (body.clientWidth > body.clientHeight * 0.9 && vertical) {
+            elem("profImgDiv").innerHTML = ""
+            elem("profileVertical").innerHTML = ""
+
+            elem("profImgDiv").style.width = "20%"
+            elem("infoDiv").style.maxWidth = "79%"
+
+            let img = document.createElement("img")
+            img.style.width = "100%"
+            img.style.height = img.clientWidth.toString() + "px"
+            img.className = "profImg"
+            img.id = "profImg"
+
+            elem("profImgDiv").appendChild(img)
+
+            console.log("Switch to horizontal")
+
+            location.reload()
+
+            vertical = false
+        } else if (body.clientWidth < body.clientHeight && !vertical) {
+
+            elem("profImgDiv").innerHTML = ""
+            elem("profileVertical").innerHTML = ""
+
+            elem("name").style.fontSize = "50pt"
+            elem("description").style.fontSize = "28pt"
+            elem("quote").style.fontSize = "38pt"
+            elem("uniName").style.fontSize = "32pt"
+            elem("courseName").style.fontSize = "28pt"
+
+            let img = document.createElement("img")
+            if (profURL === "") {
+                img.src = "media/logo.JPG"
+            } else {
+                img.src = profURL
+            }
+            img.style.width = "99%"
+            img.style.height = img.clientWidth.toString() + "px"
+            img.id = "vertImg"
+
+            elem("profImgDiv").style.width = "0"
+            elem("infoDiv").style.maxWidth = "99%"
+            elem("main-div").style.width = (body.clientWidth + 10).toString() + "px"
+            elem("main-div").style.left = "20px"
+            elem("infoDiv").style.paddingTop = "20px"
+            elem("infoDiv").style.marginTop = "0"
+            elem("infoDiv").style.paddingLeft = "10px"
+
+            elem("main-div").style.marginTop = "-5px"
+
+            elem("profileVertical").appendChild(img)
+            console.log("ADDED VERTICAL")
+
+            elem("name").style.paddingTop = "10px"
+
+            vertical = true
+        }
+
+
+        elem("background-image").style.height = body.scrollHeight.toString() + "px"
+
+        elem("uniText").style.width = (elem("uniDiv").clientWidth -  elem("uniImg").clientWidth - 25).toString() + "px"
+
+        if (!vertical) {
+            elem("profImgDiv").style.maxHeight = (elem("infoDiv").clientHeight - 20).toString() + "px"
+
+            if (elem("profImgDiv").clientWidth > elem("profImgDiv").clientHeight) {
+                console.log("W>H")
+                console.log((elem("profImgDiv").clientHeight - 30).toString())
+                elem("profImg").style.height = (elem("profImgDiv").clientHeight - 30).toString() + "px"
+                elem("profImg").style.width = (elem("profImg").clientHeight).toString() + "px"
+            } else {
+                elem("profImg").style.width = (elem("profImgDiv").clientWidth - 10).toString() + "px"
+                elem("profImg").style.height = (elem("profImg").clientWidth).toString() + "px"
+            }
+            elem("profImg").style.paddingLeft = ((elem("profImgDiv").clientWidth - elem("profImg").clientWidth)/2 - 1).toString() + "px"
+            elem("profImg").style.paddingRight = ((elem("profImgDiv").clientWidth - elem("profImg").clientWidth)/2 - 1).toString() + "px"
+
+            //elem("profImg").style.maxHeight = (elem("profImgDiv").clientHeight - 50).toString() + "px"
+
+            elem("other-unis").style.height = (elem("background-image").clientHeight - elem("main-div").clientHeight - 1).toString() + "px"
+
+            elem("uniDiv").style.height = (body.clientHeight.toString() * 0.2).toString() + "px"
+
+            elem("uniImg").style.maxWidth = "20%"
+            elem("uniImg").style.height = (elem("uniText").clientHeight).toString() + "px"
+            elem("uniImg").style.width = elem("uniImg").clientHeight.toString() + "px"
+            if (elem("uniImg").clientHeight > elem("uniText").clientHeight * 0.3) {
+                elem("uniImg").style.height = elem("uniImg").clientWidth.toString() + "px"
+            }
+            elem("uniImg").style.borderRadius = "10%"
+            elem("uniImg").style.marginTop = ((elem("uniDiv").clientHeight - elem("uniImg").clientHeight)/2 - 1).toString() + "px"
+
+            elem("uniName").style.marginTop = ((elem("uniDiv").clientHeight - elem("uniName").clientHeight - elem("courseName").clientHeight)/2 - 1).toString() + "px"
+        } else {
+            //elem("background-image").style.height = (elem("main-div").clientHeight + elem("other-unis").clientHeight + elem("profileVertical").clientHeight + 15).toString() + "px"
+            elem("vertImg").style.height = elem("vertImg").clientWidth.toString() + "px"
+            elem("infoDiv").style.width = (body.clientWidth - 5).toString() + "px"
+            elem("uniDiv").style.height = (body.clientHeight.toString() * 0.2).toString() + "px"
+
+            if (profURL === "") {
+                elem("vertImg").src = "media/empty-prof.svg"
+            } else {
+                elem("vertImg").src = profURL
+            }
+
+            elem("other-unis").style.height = (body.scrollHeight - elem("main-div").clientHeight - elem("profileVertical").clientHeight).toString() + "px"
+            elem("uniImg").style.width = (body.clientWidth * 0.3).toString() + "px"
+            elem("uniImg").style.height = (body.clientWidth * 0.3).toString() + "px"
+            elem("uniImg").style.maxHeight = (body.clientWidth * 0.3).toString() + "px"
+
+            elem("uniImg").style.marginTop = ((elem("uniDiv").clientHeight - elem("uniImg").clientHeight)/2 - 1).toString() + "px"
+            elem("uniImg").style.borderRadius = "10%"
+
+            elem("uniText").style.width = (body.clientWidth - elem("uniImg").clientWidth - 130).toString() + "px"
+            elem("uniText").style.height = "98%"
+
+            elem("uniName").style.marginTop = ((elem("uniDiv").clientHeight - elem("uniName").clientHeight - elem("courseName").clientHeight)/2 - 1).toString() + "px"
+        }
+
+    }
+    
+    function elem(id){
+        return document.getElementById(id)
+    }
+
+    function addUniversity(name, course, img_src) {
+        let div = document.createElement("div")
+
+        let imageDiv = document.createElement("div")
+        imageDiv.style.float = "left"
+        imageDiv.style.marginBottom = "15px"
+
+        let image = document.createElement("img")
+        image.src = img_src
+        image.alt = name + "'s Logo"
+        image.className = "otherUniLogo"
+        image.style.borderRadius = "5px"
+        image.style.backgroundColor = "#ffffff"
+        imageDiv.appendChild(image)
+
+        let uniDiv = document.createElement("div")
+        uniDiv.style.float = "right"
+        uniDiv.style.paddingLeft = "5px"
+        uniDiv.style.marginBottom = "15px"
+
+        let uniName = document.createElement("h3")
+        uniName.innerText = name
+        uniName.className = "uniName"
+        uniName.style.paddingTop = "10px"
+        uniDiv.appendChild(uniName)
+
+        let courseName = document.createElement("p")
+        courseName.innerText = course
+        courseName.className = "courseName"
+        courseName.style.paddingBottom = "10px"
+        uniDiv.appendChild(courseName)
+
+        div.appendChild(imageDiv)
+        div.appendChild(uniDiv)
+
+        document.getElementById("other-unis").appendChild(div)
+
+        imageDiv.style.height = uniDiv.clientHeight.toString() + "px"
+        imageDiv.style.width = imageDiv.clientHeight.toString() + "px"
+
+        image.style.height = imageDiv.clientHeight.toString() + "px"
+        image.style.width = imageDiv.clientWidth.toString() + "px"
+        image.style.objectFit = "contain"
+
+        uniDiv.style.width = (div.clientWidth - imageDiv.clientWidth - 30).toString() + "px"
+    }
+</script>
+
+</body>
+</html>
