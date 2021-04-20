@@ -78,6 +78,9 @@
     }
 
     function updatePageData() {
+        destinations = 0
+        offers = 0
+
         document.getElementById("page-indicator").innerText = "Page (" + (page + 1).toString() + "/" + (pageTotal + 1).toString() + ")"
         document.getElementById("page-description").innerText = destinations.toString() + " different destinations, " + offers.toString() + " total offers."
     }
