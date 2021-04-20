@@ -23,32 +23,34 @@
 <body onload="init()" style="height: 100%; overflow-x: hidden">
 
 <div class="image-background" id="background-image" style="padding-left: 20px">
-    <a style="position: absolute; right: 20px; top: 20px; color: black" href="#" onclick="generateImage()">Generate Profile Image</a>
-    <div style="height: 120px; width: 100%">
-        <button style="background-color: white; border-radius: 10px; margin-top: 40px; width: 200px; height: 60px; margin-left: 20px; font-size: 15pt; font-weight: bold" onclick="toMain()">See All Graduates</button>
-    </div>
-    <div id="profileVertical" style="width:100%"></div>
-    <div class="blur-div" id="main-div" align="center" style="overflow: hidden">
-        <div style="float: left; width: 20%; align-content: center" id="profImgDiv">
-            <img class="profImg" src="media/logo.JPG" alt="Profile Picture" id="profImg" style="border-radius: 10%">
+    <div class="blur-div-2">
+        <a style="position: absolute; right: 20px; top: 20px; color: black" href="#" onclick="generateImage()">Generate Profile Image</a>
+        <div style="height: 120px; width: 100%">
+            <button style="background-color: white; border-radius: 10px; margin-top: 40px; width: 200px; height: 60px; margin-left: 20px; font-size: 15pt; font-weight: bold" onclick="toMain()">See All Graduates</button>
         </div>
-        <div style="width: 79%; float: right; padding-top: 50px;" id="infoDiv">
-            <div style="height: 64%; overflow: auto;">
-                <h1 style="width: 100%; text-align: left; margin-top: 0; text-size-adjust: none; -webkit-text-size-adjust:none; font-size: 30pt" id="name">NAME LASTNAME</h1>
-                <p style="padding-right: 10%; text-align: justify; text-size-adjust: none; -webkit-text-size-adjust:none; font-size: 20pt" id="description">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+        <div id="profileVertical" style="width:100%"></div>
+        <div class="blur-div" id="main-div" style="overflow: hidden">
+            <div style="float: left; width: 20%; align-content: center" id="profImgDiv">
+                <img class="profImg" src="media/logo.JPG" alt="Profile Picture" id="profImg" style="border-radius: 10%">
             </div>
-            <h1 style="font-size: 26pt; padding-right: 20px; text-size-adjust: none; -webkit-text-size-adjust:none; text-align: left" id="quote">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Facilisis sed odio morbi quis commodo odio. Eu volutpat odio facilisis mauris.</h1>
-            <div class="uniDiv" id="uniDiv" style="margin-bottom: 20px">
-                <img src="media/no-image.jpg" alt="University Logo" style="width: 40%; max-height: 100%; height:5px; float: left; border-radius: 5px; background-color: #FFFFFF; object-fit: contain" id="uniImg">
-                <div class="uniText" id="uniText">
-                    <h3 class="uniName" id="uniName" style="text-size-adjust: none; -webkit-text-size-adjust:none;">University of ______</h3>
-                    <p class="courseName" id="courseName" style="text-size-adjust: none; -webkit-text-size-adjust:none;">To Study: _________</p>
+            <div style="width: 79%; float: right; padding-top: 50px;" id="infoDiv">
+                <div style="height: 64%; overflow: auto;">
+                    <h1 style="width: 100%; text-align: left; margin-top: 0; text-size-adjust: none; -webkit-text-size-adjust:none; font-size: 30pt" id="name">NAME LASTNAME</h1>
+                    <p style="padding-right: 10%; text-align: justify; text-size-adjust: none; -webkit-text-size-adjust:none; font-size: 20pt" id="description">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                </div>
+                <h1 style="font-size: 26pt; padding-right: 20px; text-size-adjust: none; -webkit-text-size-adjust:none; text-align: left" id="quote">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Facilisis sed odio morbi quis commodo odio. Eu volutpat odio facilisis mauris.</h1>
+                <div class="uniDiv" id="uniDiv" style="margin-bottom: 20px">
+                    <img src="media/no-image.jpg" alt="University Logo" style="width: 40%; max-height: 100%; height:5px; float: left; border-radius: 5px; background-color: #FFFFFF; object-fit: contain" id="uniImg">
+                    <div class="uniText" id="uniText">
+                        <h3 class="uniName" id="uniName" style="text-size-adjust: none; -webkit-text-size-adjust:none;">University of ______</h3>
+                        <p class="courseName" id="courseName" style="text-size-adjust: none; -webkit-text-size-adjust:none;">To Study: _________</p>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="blur-div" id="other-unis" style="padding-left:30px; margin-top: -19px; font-size: 26pt">
-        <h3 style="padding-top: 10px; padding-top: 40px">Other Offers/Acceptances</h3>
+        <div class="blur-div-2" id="other-unis" style="padding-left:30px; margin-top: 0; font-size: 26pt; padding-top: 20px">
+            <h3>Other Offers/Acceptances</h3>
+        </div>
     </div>
 </div>
 
@@ -112,7 +114,7 @@
                         elem(imgID).src = "media/no-image.jpg"
                     }
                 }
-                document.getElementById("uniName").onclick = function (event) {
+                document.getElementById("uniName").onclick = function () {
                     window.location = "university.html?id=" + uniID
                 }
                 adjustUI()
@@ -344,7 +346,7 @@
         uniName.innerText = name
         uniName.className = "uniName"
         uniName.style.paddingTop = "10px"
-        uniName.onclick = function (event) {
+        uniName.onclick = function () {
             window.location = "university.html?id=" + id
         }
         uniDiv.appendChild(uniName)
@@ -368,6 +370,8 @@
         image.style.objectFit = "contain"
 
         uniDiv.style.width = (div.clientWidth - imageDiv.clientWidth - 30).toString() + "px"
+
+        div.style.height = (image.clientHeight + 20).toString() + "px"
     }
 </script>
 

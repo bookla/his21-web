@@ -27,8 +27,9 @@
     <div class="blur-div" id="blur-div" style="overflow: auto; padding-left: 20px">
         <div id="main-div" style="width:70%; margin-left: 14%; margin-right: 15%; padding-top:1%; padding-bottom: 10%">
             <h1 class="gradTitle">HIS21 Graduates</h1>
-            <div style="height: 100px; width: 100%">
-                <button style="background-color: white; border-radius: 10px; margin-top: 0; width: 350px; height: 60px; margin-left: 0; font-size: 15pt; font-weight: bold" onclick="toUni()">See Universities List</button>
+            <div style="width: 100%">
+                <button style="background-color: white; border-radius: 10px; margin-top: 0; width: 350px; height: 60px; margin-left: 0; font-size: 18pt; font-weight: bold; margin-bottom: 10px" onclick="fillForm()">Fill Form</button>
+                <button style="background-color: white; border-radius: 10px; margin-top: 0; width: 350px; height: 60px; margin-left: 0; font-size: 15pt; font-weight: bold; margin-bottom: 10px" onclick="toUni()">See University List</button>
             </div>
 
             <div id="students-list">
@@ -50,6 +51,10 @@
     let page = 0
     let pageTotal = 0
     let pageSize = 10
+
+    function fillForm() {
+        window.location = "../login.html?fwd=grad_form"
+    }
 
     function toUni() {
         window.location = "universities.html"
@@ -94,7 +99,7 @@
     function loadUsers() {
         let i = -1
         db.collection("gradData").orderBy("name").get().then((querySnapshot) => {
-            pageTotal = Math.floor((querySnapshot.size - 2)/pageSize)
+            pageTotal = Math.floor((querySnapshot.size - 1)/pageSize)
             updatePageIndicator()
             querySnapshot.forEach((doc) => {
                 i++
