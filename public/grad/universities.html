@@ -78,9 +78,6 @@
     }
 
     function updatePageData() {
-        destinations = 0
-        offers = 0
-
         document.getElementById("page-indicator").innerText = "Page (" + (page + 1).toString() + "/" + (pageTotal + 1).toString() + ")"
         document.getElementById("page-description").innerText = destinations.toString() + " different destinations, " + offers.toString() + " total offers."
     }
@@ -88,6 +85,8 @@
 
     function loadUsers() {
         let i = -1
+        destinations = 0
+        offers = 0
         db.collection("gradUni").orderBy("name").get().then((querySnapshot) => {
             console.log(querySnapshot.size)
             querySnapshot.forEach((doc) => {
