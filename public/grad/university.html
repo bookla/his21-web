@@ -11,12 +11,12 @@
 
 <div id="background-image"  class="image-background">
     <div class="blur-div" id="blur-div" style="overflow: auto; padding-left: 10px;">
-        <div class="blur-div-2" id="top-blur-div" style="width: 100%;overflow: auto; padding-left: 10px; height: 120px; position: absolute; top: 0">
-            <button style="width: 10%; height: 30px; margin-right: 88%; margin-left: 1%; margin-top: 10px" onclick="backToMain()">< Universities</button>
+        <div class="blur-div-2" id="top-blur-div" style="width: 100%;overflow: auto; padding-left: 10px; height: 150px; position: absolute; top: 0">
+            <button style="background-color: white; border-radius: 10px; margin-top: 10px; width: 12%; margin-right: 85%; height: 50px; margin-left: 1%; font-size: 15pt; font-weight: bold" onclick="backToMain()">< Universities</button>
             <h1 id="university-name" style="float: left; height: 28px; padding-left: 30px; padding-bottom: 10px">University Name</h1>
             <h2 id="university-details" style="float: right; height: 28px; padding-right: 20px; padding-top: 10px">University Details</h2>
         </div>
-        <div style="padding-top: 140px">
+        <div style="padding-top: 170px">
             <div id="firm-div" style="width: 70%; margin-left: 10%; margin-right: 9%">
                 <h2 id="firm-text" style="width: 90%; padding-left: 20px">People going to this university</h2>
                 <div id="firm-list">
@@ -41,7 +41,7 @@
     let offers = 0
 
     function backToMain() {
-        window.location("universities.html")
+        window.location = "universities.html"
     }
 
     function adjustUI() {
@@ -52,7 +52,7 @@
         if (firm === 0) {
             document.getElementById("firm-text").innerText = "No one is going to this university"
         } else {
-            document.getElementById("other-text").innerText = "People who firmed this university"
+            document.getElementById("firm-text").innerText = "People who firmed this university"
         }
         if (offers === 0) {
             document.getElementById("other-text").innerText = "No one received an offer from this university"
@@ -204,10 +204,7 @@
             id = param["id"]
             loadUniversity(param["id"])
         } else {
-            //TODO: Redirect to universities
-            id = "80cbe5"
-            //window.location = "./universities.html"
-            loadUniversity("80cbe5")
+            window.location = "./universities.html"
         }
     }
 </script>
@@ -217,7 +214,7 @@
 <script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-analytics.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-firestore.js"></script>
-<script src="grad-support.js?v=43"></script>
+<script src="grad-support.js?v=45"></script>
 
 
 <!-- Firebase Integration -->

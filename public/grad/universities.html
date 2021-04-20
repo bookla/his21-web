@@ -3,8 +3,198 @@
 <head>
     <meta charset="UTF-8">
     <title>HIS21 Destinations</title>
+
+    <link rel="stylesheet" href="grad-style.css?v=34">
+    <link rel="stylesheet" href="../common-style.css">
 </head>
-<body>
+<body onload="init()">
+
+<div id="background-image"  class="image-background" style="">
+    <div class="blur-div" id="blur-div" style="overflow: auto; padding-left: 20px">
+        <div id="main-div" style="width:70%; margin-left: 14%; margin-right: 15%; padding-top:1%; padding-bottom: 10%">
+            <h1 class="gradTitle">HIS21 Destinations</h1>
+            <div style="height: 100px; width: 100%">
+                <button style="background-color: white; border-radius: 10px; margin-top: 0; width: 350px; height: 60px; margin-left: 0; font-size: 15pt; font-weight: bold" onclick="toGrad()">See Graduates List</button>
+            </div>
+
+            <div id="university-list">
+
+            </div>
+
+            <div id="page-navigator">
+                <p id="page-indicator" style="text-align: center; width: 100%">Page Number</p>
+                <a id="back-button" class="back" style="float: left;" href="#" onclick="lastPage()">Back</a>
+                <a id="next-button" class="next" style="float: right;" href="#" onclick="nextPage()">Next</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="grad-support.js?v=32"></script>
+
+<script>
+    let page = 0
+    let pageTotal = 0
+    let pageSize = 10
+
+    function toGrad() {
+        window.location = "index.html"
+    }
+
+    function nextPage() {
+        if (pageTotal !== 0 && page < pageTotal) {
+            page += 1
+            document.getElementById("university-list").innerHTML = ""
+            loadUsers()
+            updatePageIndicator()
+        }
+    }
+
+    function lastPage() {
+        if (page > 0) {
+            page -= 1
+            document.getElementById("university-list").innerHTML = ""
+            loadUsers()
+            updatePageIndicator()
+        }
+    }
+
+    function updatePageIndicator() {
+        document.getElementById("page-indicator").innerText = "Page (" + (page + 1).toString() + "/" + (pageTotal + 1).toString() + ")"
+    }
+
+
+    function loadUsers() {
+        let i = -1
+        db.collection("gradUni").orderBy("name").get().then((querySnapshot) => {
+            console.log(querySnapshot.size)
+            let n = 0
+            querySnapshot.forEach((doc) => {
+                i++
+                if (page*pageSize < i && i <= page*pageSize + pageSize) {
+                    let data = doc.data()
+
+                    let name = data["name"]
+                    let firm = data["firm"]
+                    let other = data["other"]
+                    let image = data["img"]
+
+                    let description = "No Data Available (Awaiting indexing)"
+
+                    if (firm !== undefined && other !== undefined) {
+                        description = firm.toString() + " firmed, " + (other + firm).toString() + " offer(s)."
+                        createCell(name, description, image, doc.id, document, document.getElementById("university-list"), "university", "id")
+                    }
+                }
+            });
+            pageTotal = Math.floor((querySnapshot.size - 2)/pageSize)
+            updatePageIndicator()
+        });
+    }
+
+    function adjustUI() {
+        if (document.getElementsByTagName("body")[0].clientWidth < document.getElementsByTagName("body")[0].clientHeight) {
+            document.getElementById("main-div").style.width = "90%"
+            document.getElementById("main-div").style.marginLeft = "4%"
+            document.getElementById("main-div").style.marginRight = "5%"
+        } else {
+            document.getElementById("main-div").style.width = "70%"
+            document.getElementById("main-div").style.marginLeft = "14%"
+            document.getElementById("main-div").style.marginRight = "15%"
+        }
+
+        document.getElementById("background-image").style.width = document.getElementsByTagName("body")[0].clientWidth.toString() + "px"
+        document.getElementById("background-image").style.height = document.getElementsByTagName("body")[0].scrollHeight.toString() + "px"
+
+        document.getElementById("blur-div").style.width = (document.getElementsByTagName("body")[0].clientWidth - 20).toString() + "px"
+        document.getElementById("blur-div").style.height = document.getElementsByTagName("body")[0].scrollHeight.toString() + "px"
+
+        let divs = document.getElementById("university-list").querySelectorAll("div")
+        for (let i=0; i<divs.length; i++) {
+            let studentCell = divs[i]
+            if (studentCell.id[0] === "D") {
+                let studentNodes = studentCell.querySelectorAll("div")
+                let imageDiv = undefined
+                let nameDiv = undefined
+
+                for (let k=0; k<studentNodes.length; k++) {
+                    if (studentNodes[k].id[0] === "L") {
+                        imageDiv = studentNodes[k]
+                    } else if (studentNodes[k].id[0] === "R") {
+                        nameDiv = studentNodes[k]
+                    }
+                }
+
+                let nameNode = undefined
+                let detailNode = undefined
+
+                let infoNodes = nameDiv.querySelectorAll("h1, h2, h3, h4, h5, h6, p")
+
+                for (let j=0; j<infoNodes.length; j++) {
+                    if (infoNodes[j].id[0] === "T") {
+                        nameNode = infoNodes[j]
+                    } else if (infoNodes[j].id[0] === "B") {
+                        detailNode = infoNodes[j]
+                    }
+                }
+
+                if (document.getElementsByTagName("body")[0].clientWidth < document.getElementsByTagName("body")[0].clientHeight) {
+                    //IF VERTICAL REDUCE FONT SIZE
+                    nameNode.style.fontSize = "34pt"
+                    detailNode.style.fontSize = "20pt"
+                } else {
+                    nameNode.style.fontSize = "34pt"
+                    detailNode.style.fontSize = "20pt"
+                }
+
+                imageDiv.style.height = (imageDiv.clientWidth).toString() + "px"
+
+                if (imageDiv.clientHeight < 150) {
+                    imageDiv.style.height = "150px"
+                    imageDiv.style.width = (imageDiv.clientHeight).toString() + "px"
+                }
+
+                let paddingTotalPercent = 0.0
+                let paddingTotalAbsolute = 30
+                nameDiv.style.width = (studentCell.clientWidth - imageDiv.clientWidth - studentCell.clientWidth*paddingTotalPercent - paddingTotalAbsolute).toString() + "px"
+
+                studentCell.style.height = imageDiv.clientHeight.toString() + "px"
+
+                //AFTER CELL SIZING
+                nameNode.style.paddingTop = "0"
+                nameNode.style.paddingTop = ((studentCell.clientHeight - nameNode.clientHeight - detailNode.clientHeight)/2 - 10).toString() + "px"
+            }
+        }
+    }
+
+
+    function init() {
+        document.getElementById("background-image").style.backgroundImage = "url(media/harrow-international-school.jpg)"
+
+        loadUsers()
+        adjustUI()
+        window.addEventListener("resize", adjustUI);
+    }
+</script>
+
+
+<!-- Importing modules -->
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-analytics.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-firestore.js"></script>
+
+
+<!-- Firebase Integration -->
+
+<script src="../credentials.js"></script>
+
+<script>
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+
+    let db = firebase.firestore();
+</script>
 
 </body>
 </html>

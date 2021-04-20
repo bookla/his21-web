@@ -101,12 +101,12 @@ function generateUID(length) {
     return result;
 }
 
-function createCell(name, description, imageSrc, uid, doc, elem) {
+function createCell(name, description, imageSrc, uid, doc, elem, link="profile", idLink="uid") {
     let cell = document.createElement("div")
     cell.id = "D-" + uid
     cell.className = "cell"
     cell.onclick = function () {
-        window.location = "profile.html?uid=" + uid.toString()
+        window.location = link + ".html?" + idLink + "=" + uid.toString()
     }
 
     let imageDiv = doc.createElement("div")

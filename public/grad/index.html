@@ -4,15 +4,18 @@
     <meta charset="UTF-8">
     <title>HIS21 Graduate Profiles</title>
 
-    <link rel="stylesheet" href="grad-style.css">
+    <link rel="stylesheet" href="grad-style.css?v=34">
     <link rel="stylesheet" href="../common-style.css">
 </head>
 <body onload="init()">
 
 <div id="background-image"  class="image-background" style="">
     <div class="blur-div" id="blur-div" style="overflow: auto; padding-left: 20px">
-        <div id="main-div" style="width:70%; margin-left: 14%; margin-right: 15%; padding-top:8%; padding-bottom: 10%">
+        <div id="main-div" style="width:70%; margin-left: 14%; margin-right: 15%; padding-top:1%; padding-bottom: 10%">
             <h1 class="gradTitle">HIS21 Graduates</h1>
+            <div style="height: 100px; width: 100%">
+                <button style="background-color: white; border-radius: 10px; margin-top: 0; width: 350px; height: 60px; margin-left: 0; font-size: 15pt; font-weight: bold" onclick="toUni()">See Universities List</button>
+            </div>
 
             <div id="students-list">
 
@@ -27,12 +30,16 @@
     </div>
 </div>
 
-<script src="grad-support.js"></script>
+<script src="grad-support.js?v=32"></script>
 
 <script>
     let page = 0
     let pageTotal = 0
     let pageSize = 10
+
+    function toUni() {
+        window.location = "universities.html"
+    }
 
     function nextPage() {
         if (pageTotal !== 0 && page < pageTotal) {
@@ -73,7 +80,7 @@
     function loadUsers() {
         let i = -1
         db.collection("gradData").orderBy("name").get().then((querySnapshot) => {
-            pageTotal = Math.floor(querySnapshot.size/pageSize)
+            pageTotal = Math.floor((querySnapshot.size - 2)/pageSize)
             updatePageIndicator()
             querySnapshot.forEach((doc) => {
                 i++
@@ -140,6 +147,9 @@
 
                 if (document.getElementsByTagName("body")[0].clientWidth < document.getElementsByTagName("body")[0].clientHeight) {
                     //IF VERTICAL REDUCE FONT SIZE
+                    nameNode.style.fontSize = "34pt"
+                    detailNode.style.fontSize = "20pt"
+                } else {
                     nameNode.style.fontSize = "34pt"
                     detailNode.style.fontSize = "20pt"
                 }

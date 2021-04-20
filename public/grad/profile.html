@@ -11,6 +11,9 @@
 
 <div class="image-background" id="background-image" style="padding-left: 20px">
     <a style="position: absolute; right: 20px; top: 20px; color: black" href="#" onclick="generateImage()">Generate Profile Image</a>
+    <div style="height: 120px; width: 100%">
+        <button style="background-color: white; border-radius: 10px; margin-top: 40px; width: 200px; height: 60px; margin-left: 20px; font-size: 15pt; font-weight: bold" onclick="toMain()">See All Graduates</button>
+    </div>
     <div id="profileVertical" style="width:100%"></div>
     <div class="blur-div" id="main-div" align="center" style="overflow: hidden">
         <div style="float: left; width: 20%; align-content: center" id="profImgDiv">
@@ -55,6 +58,10 @@
 
 <script>
 
+    function toMain() {
+        window.location = "index.html"
+    }
+
     let otherUnis = []
     let vertical = false
     let uid = ""
@@ -76,10 +83,7 @@
             uid = param["uid"]
             loadFromID(param["uid"])
         } else {
-            //TODO: Redirect to index
-            //window.location = "./index.html"
-            uid = "G6LBqFqMcvSFvUMnVXFFwABtbew2"
-            loadFromID("G6LBqFqMcvSFvUMnVXFFwABtbew2")
+            window.location = "./index.html"
         }
     }
 
