@@ -150,7 +150,7 @@
             alert("Session expired. Copy your responses and reload the page")
             return
         }
-        dump(document, "gradRaw", uid, {img: fileURL, additional: getAdditionalUniversities(), "check_manual": true, "check_auto": false}, window, "./submitted.html")
+        dump(document, "gradRaw", uid, {img: fileURL, additional: getAdditionalUniversities(), "check_manual": false, "check_auto": true}, window, "./submitted.html")
     }
 
     let additionalUnis = []

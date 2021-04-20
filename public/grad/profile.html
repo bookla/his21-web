@@ -95,6 +95,9 @@
                         elem(imgID).src = "media/no-image.jpg"
                     }
                 }
+                document.getElementById("uniName").onclick = function (event) {
+                    window.location = "university.html?id=" + uniID
+                }
                 adjustUI()
             } else {
                 console.log("Can't find university with id" + uniID.toString())
@@ -115,7 +118,7 @@
 
                 otherUnis.push([data["name"], course, img])
 
-                addUniversity(data["name"], course, img)
+                addUniversity(data["name"], course, img, userDoc.id)
                 adjustUI()
             } else {
                 console.log("Can't find university with id" + uniID.toString())
@@ -300,7 +303,7 @@
         return document.getElementById(id)
     }
 
-    function addUniversity(name, course, img_src) {
+    function addUniversity(name, course, img_src, id) {
         let div = document.createElement("div")
 
         let imageDiv = document.createElement("div")
@@ -324,6 +327,9 @@
         uniName.innerText = name
         uniName.className = "uniName"
         uniName.style.paddingTop = "10px"
+        uniName.onclick = function (event) {
+            window.location = "university.html?id=" + id
+        }
         uniDiv.appendChild(uniName)
 
         let courseName = document.createElement("p")

@@ -90,3 +90,60 @@ async function dump(domDoc, collection, document, defaultValues, window, locatio
         return true
     })
 }
+
+function generateUID(length) {
+    let result           = '';
+    let characters       = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let charactersLength = characters.length;
+    for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+}
+
+function createCell(name, description, imageSrc, uid, doc, elem) {
+    let cell = document.createElement("div")
+    cell.id = "D-" + uid
+    cell.className = "cell"
+    cell.onclick = function () {
+        window.location = "profile.html?uid=" + uid.toString()
+    }
+
+    let imageDiv = doc.createElement("div")
+    imageDiv.id = "L-" + generateUID(6)
+    imageDiv.className = "cellImageDiv"
+
+    let image = doc.createElement("img")
+    image.className = "cellImage"
+    image.alt = name + "'s Profile Picture"
+    image.src = imageSrc
+
+    imageDiv.appendChild(image)
+
+    cell.appendChild(imageDiv)
+
+    let infoDiv = doc.createElement("div")
+    infoDiv.id = "R-" + generateUID(6)
+    infoDiv.className = "cellInfoDiv"
+    infoDiv.style.paddingRight = "10px"
+
+    let nameNode = doc.createElement("h2")
+    nameNode.id = "T-" + generateUID(6)
+    nameNode.className = "cellName"
+    nameNode.innerText = name
+
+    infoDiv.appendChild(nameNode)
+
+    let detailNode = doc.createElement("p")
+    detailNode.id = "B-" + generateUID(6)
+    detailNode.className = "cellDescription"
+    detailNode.innerText = description
+
+    infoDiv.appendChild(detailNode)
+
+    cell.appendChild(infoDiv)
+
+    elem.appendChild(cell)
+
+    adjustUI()
+}

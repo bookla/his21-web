@@ -27,6 +27,8 @@
     </div>
 </div>
 
+<script src="grad-support.js"></script>
+
 <script>
     let page = 0
     let pageTotal = 0
@@ -54,53 +56,6 @@
         document.getElementById("page-indicator").innerText = "Page (" + (page + 1).toString() + "/" + (pageTotal + 1).toString() + ")"
     }
 
-    function createCell(name, description, imageSrc, uid) {
-        let cell = document.createElement("div")
-        cell.id = "D-" + uid
-        cell.className = "cell"
-        cell.onclick = function () {
-            window.location = "profile.html?uid=" + uid.toString()
-        }
-
-        let imageDiv = document.createElement("div")
-        imageDiv.id = "L-" + generateUID(6)
-        imageDiv.className = "cellImageDiv"
-
-        let image = document.createElement("img")
-        image.className = "cellImage"
-        image.alt = name + "'s Profile Picture"
-        image.src = imageSrc
-
-        imageDiv.appendChild(image)
-
-        cell.appendChild(imageDiv)
-
-        let infoDiv = document.createElement("div")
-        infoDiv.id = "R-" + generateUID(6)
-        infoDiv.className = "cellInfoDiv"
-        infoDiv.style.paddingRight = "10px"
-
-        let nameNode = document.createElement("h2")
-        nameNode.id = "T-" + generateUID(6)
-        nameNode.className = "cellName"
-        nameNode.innerText = name
-
-        infoDiv.appendChild(nameNode)
-
-        let detailNode = document.createElement("p")
-        detailNode.id = "B-" + generateUID(6)
-        detailNode.className = "cellDescription"
-        detailNode.innerText = description
-
-        infoDiv.appendChild(detailNode)
-
-        cell.appendChild(infoDiv)
-
-        document.getElementById("students-list").appendChild(cell)
-
-        adjustUI()
-    }
-
 
     function getUniversityAndCreate(name, uid, image, universityID, course) {
         db.collection("gradUni").doc(universityID).get().then(function (doc) {
@@ -110,7 +65,7 @@
                 let uniName = data["name"]
                 let description = uniName + " - " + course
 
-                createCell(name, description, image, uid)
+                createCell(name, description, image, uid, document, document.getElementById("students-list"))
             }
         })
     }
@@ -216,16 +171,6 @@
         loadUsers()
         adjustUI()
         window.addEventListener("resize", adjustUI);
-    }
-
-    function generateUID(length) {
-        let result           = '';
-        let characters       = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        let charactersLength = characters.length;
-        for (let i = 0; i < length; i++) {
-            result += characters.charAt(Math.floor(Math.random() * charactersLength));
-        }
-        return result;
     }
 </script>
 
