@@ -25,12 +25,15 @@
 
 <div id="background-image"  class="image-background">
     <div class="blur-div" id="blur-div" style="overflow: auto; padding-left: 10px;">
-        <div class="blur-div-2" id="top-blur-div" style="width: 100%;overflow: auto; padding-left: 10px; height: 150px; position: absolute; top: 0">
+        <div class="blur-div-2" id="top-blur-div" style="width: 100%;overflow: auto; padding-left: 10px; height: 360px; position: absolute; top: 0">
             <button style="background-color: white; border-radius: 10px; margin-top: 10px; width: 12%; margin-right: 85%; height: 50px; margin-left: 1%; font-size: 15pt; font-weight: bold" onclick="backToMain()">< Universities</button>
-            <h1 id="university-name" style="float: left; height: 28px; padding-left: 30px; padding-bottom: 10px">University Name</h1>
-            <h2 id="university-details" style="float: right; height: 28px; padding-right: 20px; padding-top: 10px">University Details</h2>
+            <div style="width: 90%; height: 220px; padding-left: 30px; padding-top: 18px">
+                <img id="uni-img" src="media/no-image.jpg" style="float:left; width: 200px; height: 200px; background-color: white; object-fit: contain" alt="University Logo">
+            </div>
+            <h1 id="university-name" style="float: left; height: 28px; padding-left: 30px; padding-bottom: 10px; width: 40%; margin-top: 0">University Name</h1>
+            <h2 id="university-details" style="float: right; height: 28px; padding-right: 20px; padding-top: 10px; width: 40%; text-align: right; margin-top: 0">University Details</h2>
         </div>
-        <div style="padding-top: 170px">
+        <div style="padding-top: 375px">
             <div id="firm-div" style="width: 70%; margin-left: 10%; margin-right: 9%">
                 <h2 id="firm-text" style="width: 90%; padding-left: 20px">People going to this university</h2>
                 <div id="firm-list">
@@ -153,6 +156,7 @@
 
                 document.getElementById("university-name").innerText = data["name"]
                 document.title = data["name"]
+                document.getElementById("uni-img").src = data["img"]
             } else {
                 alert("University data does not exist on the database")
                 window.location = "universities.html"
