@@ -36,9 +36,18 @@
             <div style="width: 79%; float: right; padding-top: 50px;" id="infoDiv">
                 <div style="height: 64%; overflow: auto;">
                     <h1 style="width: 100%; text-align: left; margin-top: 0; text-size-adjust: none; -webkit-text-size-adjust:none; font-size: 30pt" id="name">NAME LASTNAME</h1>
-                    <p style="padding-right: 10%; text-align: justify; text-size-adjust: none; -webkit-text-size-adjust:none; font-size: 20pt" id="description">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                    <div style="background-color: rgba(255, 255, 255, 0.6); padding-left: 15px; padding-top: 15px; padding-bottom: 15px; border-radius: 10px">
+                        <h2 id="message-text">'s Message</h2>
+                        <p style="padding-right: 10%; text-align: justify; text-size-adjust: none; -webkit-text-size-adjust:none; font-size: 20pt" id="description">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+                    </div>
+                </div>
+                <div id="caption-div" style="background-color: rgba(255, 255, 255, 0.6); padding-left: 15px; padding-top: 15px; padding-bottom: 15px; border-radius: 10px; margin-top: 15px">
+                    <h2 id="caption-text">A friend's message</h2>
+                    <p id="caption-message" style="padding-right: 10%; text-align: justify; text-size-adjust: none; -webkit-text-size-adjust:none; font-size: 20pt" ></p>
                 </div>
                 <h1 style="font-size: 26pt; padding-right: 20px; text-size-adjust: none; -webkit-text-size-adjust:none; text-align: left" id="quote">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Facilisis sed odio morbi quis commodo odio. Eu volutpat odio facilisis mauris.</h1>
+                <h2 id="a-level">A/AS Subjects: </h2>
+                <h2 id="leadership">Leadership & Sports Achievements: </h2>
                 <div class="uniDiv" id="uniDiv" style="margin-bottom: 20px">
                     <img src="media/no-image.jpg" alt="University Logo" style="width: 40%; max-height: 100%; height:5px; float: left; border-radius: 5px; background-color: #FFFFFF; object-fit: contain" id="uniImg">
                     <div class="uniText" id="uniText">
@@ -74,7 +83,12 @@
 <script>
 
     function toMain() {
-        window.location = "index.html"
+        let json = getJsonFromUrl()
+        if (json["page"] !== undefined) {
+            window.location = "index.html?page=" + json["page"]
+        } else {
+            window.location = "index.html"
+        }
     }
 
     let otherUnis = []
@@ -154,6 +168,9 @@
                 document.title = data["name"] + "'s Graduate Profile"
 
                 elem("name").innerText = data["name"]
+
+                elem("message-text").innerText = data["name"].split(" ")[0] + "'s Message"
+
                 elem("description").innerText = data["description"]
                 profURL = data["img"]
                 if (!vertical) {
@@ -170,6 +187,21 @@
                     }
                 } else {
                     elem("quote").innerText = ""
+                }
+
+                elem("a-level").innerText = "A/AS Subjects: " + data["aLevel"]
+
+                if (data["caption"] !== undefined) {
+                    elem("caption-message").innerText = data["caption"]
+                } else {
+                    elem("caption-div").innerHTML = ""
+                    elem("caption-div").style.backgroundColor = "rgba(0, 0, 0, 0)"
+                }
+
+                if (data["leadership"] !== undefined && data["leadership"] !== "") {
+                    elem("leadership").innerText = "Leadership & Sports Achievements: " + data["leadership"]
+                } else {
+                    elem("leadership").innerHTML = ""
                 }
 
                 elem("courseName").innerText = data["courseName"]
@@ -222,6 +254,7 @@
 
             elem("name").style.fontSize = "50pt"
             elem("description").style.fontSize = "28pt"
+            elem("caption-message").style.fontSize = "28pt"
             elem("quote").style.fontSize = "38pt"
             elem("uniName").style.fontSize = "32pt"
             elem("courseName").style.fontSize = "28pt"
@@ -310,7 +343,7 @@
             elem("uniImg").style.marginTop = ((elem("uniDiv").clientHeight - elem("uniImg").clientHeight)/2 - 1).toString() + "px"
             elem("uniImg").style.borderRadius = "10%"
 
-            elem("uniText").style.width = (body.clientWidth - elem("uniImg").clientWidth - 130).toString() + "px"
+            elem("uniText").style.width = (body.clientWidth - elem("uniImg").clientWidth - 150).toString() + "px"
             elem("uniText").style.height = "98%"
 
             elem("uniName").style.marginTop = ((elem("uniDiv").clientHeight - elem("uniName").clientHeight - elem("courseName").clientHeight)/2 - 1).toString() + "px"
