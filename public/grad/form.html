@@ -39,6 +39,13 @@
         <textarea class="multiLineBox" rows="4" id="description" required></textarea>
     </label>
 
+    <h4 class="titleWithDescription">Leadership and Sports</h4>
+    <h6 class="description">Enter your leadership positions or sports achievements here</h6>
+
+    <label>
+        <input type="text" autocomplete="off" autocapitalize="off" spellcheck="false" class="singleLineBox" id="O-leadership" required>
+    </label>
+
     <h4 class="titleWithDescription">A-Level/AS-Level Subjects</h4>
     <h6 class="description">e.g. Physics, Mathematics, Economics, Media Studies (AS), EPQ (AS) </h6>
 
@@ -90,7 +97,7 @@
     <button onclick="submit()" class="submitButton" id="submitID">Submit</button>
 </div>
 
-<script src="grad-support.js"></script>
+<script src="grad-support.js?v=39"></script>
 
 <script>
 
@@ -163,7 +170,7 @@
             alert("Session expired. Copy your responses and reload the page")
             return
         }
-        dump(document, "gradRaw", uid, {img: fileURL, additional: getAdditionalUniversities(), "check_manual": false, "check_auto": true}, window, "./submitted.html")
+        dump(document, "gradRaw", uid, {img: fileURL, additional: getAdditionalUniversities(), "check_manual": true, "check_auto": false}, window, "./submitted.html")
     }
 
     let additionalUnis = []
@@ -214,7 +221,7 @@
             tick.id = "C-checkbox"
             tick.style.display = "inline"
             tick.style.height = "26px"
-            tick.onchange = function (event) {
+            tick.onchange = function () {
                 if (tick.checked) {
                     tick.value = "YES"
                 } else {
@@ -266,6 +273,11 @@
                 db.collection("gradRaw").doc(uid).get().then(function (doc) {
                     if (doc.exists) {
                         if (doc.data()["check_auto"] === false && doc.data()["check_manual"] === false) {
+                            db.collection("gradData").doc(uid).get().then(function (doc) {
+                                if (doc.exists) {
+                                    alert("You have already submitted the form, if you wish to edit you MUST click submit for the changes to take effect.")
+                                }
+                            })
                             load(doc.data())
                             document.getElementById("submitID").disabled = false
                         } else {
