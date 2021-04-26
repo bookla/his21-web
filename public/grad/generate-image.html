@@ -157,6 +157,7 @@
                 }
 
 
+
                 if (courseName.length < 13) {
                     //document.getElementById("university-course").style.fontSize = "40pt"
                 }
@@ -168,8 +169,13 @@
                 }
 
                 document.getElementById("university-course").style.paddingTop = "0px"
+                if (courseName.split(" ")[0].length > 10) {
+                    document.getElementById("university-course").style.fontSize = "48pt"
+                    document.getElementById("university-course").style.paddingTop = (240 - document.getElementById("university-course").clientHeight + 30).toString() + "px"
+                } else {
+                    document.getElementById("university-course").style.paddingTop = (240 - document.getElementById("university-course").clientHeight).toString() + "px"
+                }
 
-                document.getElementById("university-course").style.paddingTop = (240 - document.getElementById("university-course").clientHeight).toString() + "px"
 
                 if ((data["C-checkbox"] === "YES" || data["C-checkbox"] === true) && !alt) {
                     document.getElementById("switch-mode").innerText = "Switch to Insurance"
