@@ -34,7 +34,7 @@ async function uploadProfile(doc, file, uid) {
         let imageUID = makeImageUID(6);
         let saveName = uid + imageUID + "." + fileType;
         let ref = folderRef.child(saveName);
-        await ref.put(file).then(async function (snapshot) {
+        await ref.put(file).then(async function () {
             console.log('Uploaded a file!');
             doc.getElementById("imageStatus").innerText = "Uploaded"
             fileURL = await ref.getDownloadURL()
@@ -61,7 +61,8 @@ function checkFields(doc) {
     for (let i=0; i<inputNodes.length; i++) {
         let node = inputNodes[i]
         console.log(node.value)
-        if ((node.value === "" || node.value === undefined) && node.id[0] !== "O") {
+        if ((node.value === "" || node.value === undefined) && node.id[0] !== "O" && node.id[0] !== "C" && node.id[0] !== "X") {
+            console.log(node.id)
             return false
         }
     }
@@ -101,12 +102,13 @@ function generateUID(length) {
     return result;
 }
 
-function createCell(name, description, imageSrc, uid, doc, elem, link="profile", idLink="uid") {
+function createCell(name, description, imageSrc, uid, doc, elem, link="profile", idLink="uid", page="0") {
     let cell = document.createElement("div")
     cell.id = "D-" + uid
     cell.className = "cell"
     cell.onclick = function () {
-        window.location = link + ".html?" + idLink + "=" + uid.toString()
+        console.log(page)
+        window.location = link + ".html?" + idLink + "=" + uid.toString() + "&page=" + page
     }
 
     let imageDiv = doc.createElement("div")
