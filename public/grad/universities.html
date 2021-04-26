@@ -45,7 +45,7 @@
     </div>
 </div>
 
-<script src="grad-support.js?v=32"></script>
+<script src="grad-support.js?v=34"></script>
 
 <script>
     let page = 0
@@ -62,24 +62,26 @@
     function nextPage() {
         if (pageTotal !== 0 && page < pageTotal) {
             page += 1
-            document.getElementById("university-list").innerHTML = ""
-            loadUsers()
-            updatePageData()
+            window.location = "universities.html?page=" + page.toString()
+            //document.getElementById("university-list").innerHTML = ""
+            //loadUsers()
+            //updatePageData()
         }
     }
 
     function lastPage() {
         if (page > 0) {
             page -= 1
-            document.getElementById("university-list").innerHTML = ""
-            loadUsers()
-            updatePageData()
+            window.location = "universities.html?page=" + page.toString()
+            //document.getElementById("university-list").innerHTML = ""
+            //loadUsers()
+            //updatePageData()
         }
     }
 
     function updatePageData() {
         document.getElementById("page-indicator").innerText = "Page (" + (page + 1).toString() + "/" + (pageTotal + 1).toString() + ")"
-        document.getElementById("page-description").innerText = destinations.toString() + " different destinations, " + offers.toString() + " total offers."
+        document.getElementById("page-description").innerText = destinations.toString() + " different destinations, " + (offers + destinations).toString() + " total offers."
     }
 
 
@@ -100,8 +102,8 @@
                 }
 
                 if (firm !== undefined && other !== undefined) {
-                    console.log(other)
-                    offers += (other + 1)
+                    console.log(data)
+                    offers += (Array.from(other).length + 1)
                 }
 
                 if (page*pageSize <= i && i < page*pageSize + pageSize) {
@@ -113,8 +115,9 @@
 
                     if (firm !== undefined && other !== undefined) {
                         description = firm.toString() + " firmed, " + (other + firm).toString() + " offer(s)."
-                        createCell(name, description, image, doc.id, document, document.getElementById("university-list"), "university", "id")
                     }
+
+                    createCell(name, description, image, doc.id, document, document.getElementById("university-list"), "university", "id", page.toString())
                 }
             });
             pageTotal = Math.floor((querySnapshot.size - 1)/pageSize)
@@ -200,6 +203,11 @@
 
     function init() {
         document.getElementById("background-image").style.backgroundImage = "url(media/harrow-international-school.jpg)"
+
+        let param = getJsonFromUrl()
+        if (param["page"] !== undefined && parseFloat(param["page"]) !== undefined) {
+            page = parseInt(param["page"])
+        }
 
         loadUsers()
         adjustUI()
