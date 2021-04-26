@@ -27,21 +27,43 @@
             font-family: Lustria;
             src: url('fonts/Lustria-Regular.ttf');
         }
+        .course {
+            position: absolute;
+            padding-left: 40px;
+            left: 38px;
+            top: 1517px;
+            width: 740px;
+            text-align: left;
+            font-size: 50pt !important;
+            font-family: Lustria, serif;
+            color: white;
+            line-height: 100px;
+            font-weight: lighter;
+            letter-spacing: 10px;
+            padding-top: 0;
+        }
+
+        h1, h2, h3, h4, h5, h6, p, a {
+            text-size-adjust: none;
+            -webkit-text-size-adjust:none;
+        }
     </style>
 </head>
 <body onload="onLoad()">
 
-<div id="main" style="position: absolute; top: 0; width: 1080px; height: 1080px">
-    <img src="media/HISgrad21.png" style="position: absolute; left: 100px; top: 0; width: 1080px; height: 1080px" alt="background">
-    <div id="white" style="position: absolute; left: 615px; top: 332px; width: 502px; height: 497px; background-color: white"></div>
-    <div id="house-colour" style="position: absolute; left: 628px; top: 332px; width: 494px; height: 471px; background-color: #4CAF50"></div>
-    <img id="profile-picture" src="media/logo.JPG" style="position: absolute; left:611px; top: 290px; width: 488px; height: 488px" alt="profile picture">
-    <h1 id="name" style="position: absolute; left: 180px; top:100px; width: 1000px; text-align: left; font-size: 45pt; font-family: Yeseva-One,serif; color: rgba(6,6,68,0.65)">{user.name()}</h1>
-    <h2 id="university-course" style="position: absolute; padding-left: 20px; left: 120px; top: 800px; width: 390px; text-align: left; font-size: 34pt; font-family: Lustria,serif; color: white; line-height: 60px; font-weight: lighter;">{user.university}</h2>
-    <img id="university-image" src="media/university-logo-templates.png" style="position: absolute; left:710px; top: 850px; width: 387px; height: 213px; object-fit: contain; object-position: right" alt="universityImage">
+<div id="main" style="position: absolute; top: 0; width: 2048px; height: 2048px">
+    <img src="media/HISgrad21.png" style="position: absolute; left: -8px; top: 0; width: 2048px; height: 2048px" alt="background">
+    <div id="white" style="position: absolute; left: 970px; top: 630px; width: 959px; height: 942px; background-color: white"></div>
+    <div id="house-colour" style="position: absolute; left: 1001px; top: 630px; width: 937px; height: 893px; background-color: #4CAF50"></div>
+    <img id="profile-picture" src="media/logo.JPG" style="position: absolute; left:969px; top: 550px; width: 925px; height: 925px" alt="profile picture">
+    <h1 id="name" style="position: absolute; left: 151px; top:190px; width: 1896px; text-align: left; font-size: 90pt; font-family: Yeseva-One,serif; color: rgb(9,9,68)">{user.name()}</h1>
+    <h2 id="university-course" class="course">{user.course}</h2>
+    <img id="university-image" src="media/university-logo-templates.png" style="position: absolute; left:1207px; top: 1566px; width: 720px; height: 440px; object-fit: contain; object-position: right" alt="universityImage">
+    <h2 id="is-Insurance" style="position: absolute; left: 36px; top: 20px; font-size: 40pt; margin-top: 30px; font-family: Yeseva-One, serif; color: rgb(9,9,68)">{university.isInsurance}</h2>
 </div>
 
-<a id="switch-mode" href="#" onclick="getAlt()" style="position: absolute; right: 20px; top: 20px">Loading...</a>
+<a id="switch-mode" href="#" onclick="getAlt()" style="position: absolute; right: 20px; top: 20px; font-size: 50pt">Loading...</a>
+<a id="download-button" href="#" onclick="getImage()" style="position: absolute; right: 20px; top: 100px; font-size: 50pt">Preparing....</a>
 
 <script src="../bower_components/dom-to-image/src/dom-to-image.js"></script>
 <script src="grad-support.js"></script>
@@ -52,6 +74,7 @@
     let uid = ""
 
     function getAlt() {
+        document.getElementById("download-button").innerText = "Preparing...."
         alt = !alt
         loadFromID(uid)
     }
@@ -87,7 +110,10 @@
         }
     }
 
+    let loaded = 0
+
     function loadFromID(uid) {
+        loaded = 0
         db.collection("gradData").doc(uid).get().then(async function (doc) {
             if (doc.exists) {
                 let data = doc.data()
@@ -96,36 +122,54 @@
 
                 document.getElementById("name").innerText = name
 
+                if (name.length > 19) {
+                    document.getElementById("name").style.fontSize = "78pt"
+                }
+
                 if (name.length > 20) {
-                    document.getElementById("name").style.fontSize = "38pt"
+                    document.getElementById("name").style.fontSize = "76pt"
                 }
 
                 if (name.length > 21) {
-                    document.getElementById("name").style.fontSize = "37pt"
+                    document.getElementById("name").style.fontSize = "74pt"
                 }
 
-                let courseName = undefined
+                let courseName;
 
                 if (alt) {
                     courseName = data["otherUnis"][0]["courseName"].toUpperCase()
+                    document.getElementById("is-Insurance").innerText = "Insurance"
                 } else {
                     courseName = data["courseName"].toUpperCase()
+                    document.getElementById("is-Insurance").innerText = ""
                 }
 
                 document.getElementById("university-course").innerText = courseName
 
-                document.getElementById("profile-picture").src = data["img"]
+                let picRef = storage.refFromURL(data["img"])
+                console.log(picRef)
+                document.getElementById("profile-picture").src = await picRef.getDownloadURL()
+                document.getElementById("profile-picture").onload = function () {
+                    loaded += 1
+                    if (loaded === 2) {
+                        setTimeout(enableDownload, 3000)
+                    }
+                }
+
 
                 if (courseName.length < 13) {
-                    document.getElementById("university-course").style.fontSize = "40pt"
+                    //document.getElementById("university-course").style.fontSize = "40pt"
                 }
                 if (courseName.length <= 7) {
-                    document.getElementById("university-course").style.fontSize = "55pt"
+                    //document.getElementById("university-course").style.fontSize = "55pt"
+                }
+                if (courseName.length > 26) {
+                    //document.getElementById("university-course").style.fontSize = "30pt"
                 }
 
                 document.getElementById("university-course").style.paddingTop = "0px"
 
-                document.getElementById("university-course").style.paddingTop = (120 - document.getElementById("university-course").clientHeight).toString() + "px"
+                document.getElementById("university-course").style.paddingTop = (240 - document.getElementById("university-course").clientHeight).toString() + "px"
 
                 if ((data["C-checkbox"] === "YES" || data["C-checkbox"] === true) && !alt) {
                     document.getElementById("switch-mode").innerText = "Switch to Insurance"
@@ -135,7 +179,8 @@
                     document.getElementById("switch-mode").innerText = ""
                 }
 
-                let universityID = undefined
+                let universityID;
+
                 if (alt) {
                     universityID = data["otherUnis"][0]["universityID"]
                 } else {
@@ -147,9 +192,6 @@
                     alert("Unknown University")
                     return
                 }
-                let uniData = uni.data()
-
-                document.getElementById("university-image").src = uniData["img"]
 
                 let user = await db.collection("students").doc(uid).get()
                 if (!user.exists) {
@@ -160,7 +202,18 @@
 
                 document.getElementById("house-colour").style.backgroundColor = getColour(userData["updateData"]["selection"]["houseSelector"])
 
-                //getImage()
+                let uniData = uni.data()
+
+                let httpsRef = storage.refFromURL(uniData["img"])
+
+                document.getElementById("university-image").src = await httpsRef.getDownloadURL()
+                document.getElementById("university-image").onload = function () {
+                    loaded += 1
+                    if (loaded === 2) {
+                        setTimeout(enableDownload, 3000)
+                    }
+                }
+                getImage(false)
             } else {
                 alert("Requested User Profile Does Not Exist!")
                 window.location = "index.html"
@@ -168,13 +221,18 @@
         })
     }
 
-    function getImage() {
+    function enableDownload() {
+        document.getElementById("download-button").innerText = "Download"
+    }
+
+    function getImage(save = true) {
         let node = document.getElementById('main');
 
         domtoimage.toPng(node)
             .then(function (dataUrl) {
-                downloadURI(dataUrl, "Download")
-                document.body.appendChild(img);
+                if (save) {
+                    downloadURI(dataUrl, "Download")
+                }
             })
             .catch(function (error) {
                 console.error('oops, something went wrong!', error);
@@ -199,6 +257,8 @@
 <script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-analytics.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-storage.js"></script>
 
 
 <!-- Firebase Integration -->
@@ -211,6 +271,7 @@
     firebase.analytics();
 
     let db = firebase.firestore();
+    let storage = firebase.storage();
 </script>
 
 </body>
