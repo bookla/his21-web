@@ -45,7 +45,7 @@
     </div>
 </div>
 
-<script src="grad-support.js?v=32"></script>
+<script src="grad-support.js?v=34"></script>
 
 <script>
     let page = 0
@@ -63,18 +63,20 @@
     function nextPage() {
         if (pageTotal !== 0 && page < pageTotal) {
             page += 1
-            document.getElementById("students-list").innerHTML = ""
-            loadUsers()
-            updatePageIndicator()
+            window.location = "index.html?page=" + page.toString()
+            //document.getElementById("students-list").innerHTML = ""
+            //loadUsers()
+            //updatePageIndicator()
         }
     }
 
     function lastPage() {
         if (page > 0) {
             page -= 1
-            document.getElementById("students-list").innerHTML = ""
-            loadUsers()
-            updatePageIndicator()
+            window.location = "index.html?page=" + page.toString()
+            //document.getElementById("students-list").innerHTML = ""
+            //loadUsers()
+            //updatePageIndicator()
         }
     }
 
@@ -91,7 +93,7 @@
                 let uniName = data["name"]
                 let description = uniName + " - " + course
 
-                createCell(name, description, image, uid, document, document.getElementById("students-list"))
+                createCell(name, description, image, uid, document, document.getElementById("students-list"), "profile", "uid", page.toString())
             }
         })
     }
@@ -103,7 +105,7 @@
             updatePageIndicator()
             querySnapshot.forEach((doc) => {
                 i++
-                if (page*pageSize < i <= page*pageSize + pageSize) {
+                if (page*pageSize <= i && i < page*pageSize + pageSize) {
                     let data = doc.data()
 
                     let name = data["name"]
@@ -111,7 +113,6 @@
                     let image = data["img"]
                     let universityID = data["universityID"]
                     let course = data["courseName"]
-
                     getUniversityAndCreate(name, uid, image, universityID, course)
                 }
             });
@@ -196,6 +197,11 @@
 
     function init() {
         document.getElementById("background-image").style.backgroundImage = "url(media/harrow-international-school.jpg)"
+
+        let param = getJsonFromUrl()
+        if (param["page"] !== undefined && parseFloat(param["page"]) !== undefined) {
+            page = parseInt(param["page"])
+        }
 
         loadUsers()
         adjustUI()
