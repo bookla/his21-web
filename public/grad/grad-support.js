@@ -102,7 +102,7 @@ function generateUID(length) {
     return result;
 }
 
-function createCell(name, description, imageSrc, uid, doc, elem, link="profile", idLink="uid", page="0") {
+async function createCell(name, description, imageSrc, uid, doc, elem, link="profile", idLink="uid", page="0") {
     let cell = document.createElement("div")
     cell.id = "D-" + uid
     cell.className = "cell"
@@ -139,7 +139,10 @@ function createCell(name, description, imageSrc, uid, doc, elem, link="profile",
     let detailNode = doc.createElement("p")
     detailNode.id = "B-" + generateUID(6)
     detailNode.className = "cellDescription"
-    detailNode.innerText = description
+    Promise.resolve(description).then(function (desc) {
+        detailNode.innerText = desc
+        adjustUI()
+    })
 
     infoDiv.appendChild(detailNode)
 

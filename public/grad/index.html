@@ -45,7 +45,7 @@
     </div>
 </div>
 
-<script src="grad-support.js?v=34"></script>
+<script src="grad-support.js?v=35"></script>
 
 <script>
     let page = 0
@@ -85,17 +85,12 @@
     }
 
 
-    function getUniversityAndCreate(name, uid, image, universityID, course) {
-        db.collection("gradUni").doc(universityID).get().then(function (doc) {
-            if (doc.exists) {
-                let data = doc.data()
+    async function getUniversity(universityID, course) {
+        let doc = await db.collection("gradUni").doc(universityID).get()
+        let data = doc.data()
 
-                let uniName = data["name"]
-                let description = uniName + " - " + course
-
-                createCell(name, description, image, uid, document, document.getElementById("students-list"), "profile", "uid", page.toString())
-            }
-        })
+        let uniName = data["name"]
+        return uniName + " - " + course
     }
 
     function loadUsers() {
@@ -113,7 +108,7 @@
                     let image = data["img"]
                     let universityID = data["universityID"]
                     let course = data["courseName"]
-                    getUniversityAndCreate(name, uid, image, universityID, course)
+                    createCell(name, getUniversity(universityID, course), image, uid, document, document.getElementById("students-list"), "profile", "uid", page.toString())
                 }
             });
         });
