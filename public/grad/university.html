@@ -58,7 +58,12 @@
     let offers = 0
 
     function backToMain() {
-        window.location = "universities.html"
+        let json = getJsonFromUrl()
+        if (json["page"] !== undefined) {
+            window.location = "universities.html?page=" + json["page"]
+        } else {
+            window.location = "universities.html"
+        }
     }
 
     function adjustUI() {
