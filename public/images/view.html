@@ -188,7 +188,8 @@
 
         let param = getJsonFromUrl()
         if (param["uid"]) {
-            loadFromID(param["uid"])
+            window.location = "./view-v2.html?uid=" + param["uid"]
+            //loadFromID(param["uid"])
         } else {
             window.location = "./index.html"
         }
