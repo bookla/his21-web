@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>View Images (Beta)</title>
+
+    <link rel="stylesheet" href="../common-style.css?v=4">
+    <link rel="stylesheet" href="image-style.css?v=6">
+</head>
+<body onload="init()" style="margin-left: 17px; ">
+<div id="background-image" class="image-background" style="position: absolute; top: 0; bottom: 0">
+    <div id="main-blur" class="blur-div" style="height: 100%; margin-top: 0;">
+        <div id="profile-div" class="blur-div-2" style="padding-left: 20px; padding-top: 20px; padding-bottom: 15px">
+            <h2 id="user-name" style="font-size: 38pt; margin-bottom: 20px">User's Name</h2>
+            <p id="user-description" style="font-size: 20pt">Profile description goes here</p>
+        </div>
+        <div id="gallery-div">
+        </div>
+        <div id="imageView" class="modal" onclick="closeImageView()" style="!important height: 100%;">
+
+            <span class="close" onclick="closeImageView()">&times;</span>
+
+            <img class="modal-content" id="enlargedImage" alt="Enlarged Image" src="" style="object-fit: contain; !important height: 70%">
+
+            <div align="center">
+                <p id="caption" style="max-width: 40%; max-height: 20%; text-align: center; color: white">Image Caption</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<script src="image-support.js"></script>
+
+<script>
+    function init() {
+        let param = getJsonFromUrl()
+        if (param["uid"] !== undefined) {
+            loadFromUID(param["uid"])
+        } else {
+            loadFromUID("SWwwxJl90dds67vSswz2iBxKBzR2")
+        }
+
+        window.addEventListener("resize", adjustUI);
+    }
+
+    function closeImageView() {
+        console.log("Close")
+        document.getElementById("imageView").style.display = "none";
+    }
+
+    function adjustUI() {
+        let body = document.getElementsByTagName("body")[0]
+        let div = document.getElementById("gallery-div")
+        //document.getElementById("profile-div").style.height = (body.clientHeight * 0.3).toString() + "px"
+        if (body.scrollHeight > body.clientHeight) {
+            document.getElementById("gallery-div").style.height = (body.scrollHeight - document.getElementById("profile-div")).toString() + "px"
+        } else {
+            document.getElementById("gallery-div").style.height = "100%"
+        }
+
+
+        for (let i=0; i<nodes.length; i++) {
+            let node = nodes[i]
+            let id = node.id
+            let image = document.getElementById(id)
+
+            image.style.objectFit = "cover"
+            image.style.borderWidth = "3px 3px 3px 3px"
+            image.style.margin = "3px 3px 3px 3px"
+
+            if (body.clientWidth < body.clientHeight) {
+                image.style.width = (div.clientWidth/3 - 8).toString() + "px"
+                image.style.height = (div.clientWidth/3 - 8).toString() + "px"
+            } else {
+                image.style.width = (div.clientWidth/7 - 8).toString() + "px"
+                image.style.height = (div.clientWidth/7 - 8).toString() + "px"
+            }
+        }
+    }
+
+    let nodes = [];
+
+    async function createNode(node) {
+        let image = document.createElement("img")
+        image.className = "imageNode"
+        image.id = node.id
+
+
+        //image.style.height = (image.clientWidth).toString() + "px"
+
+
+        if (node.caption !== undefined && node.caption !== "undefined" && node.caption !== "") {
+            image.alt = node.caption
+        } else {
+            image.alt = "Loading..."
+        }
+
+        let thumbnailRef = node.ref.parent.child("thumbnail").child(node.name)
+
+        thumbnailRef.getDownloadURL().then(function (url) {
+            image.src = url
+        }, function (error) {
+            Promise.resolve(node.href).then(function (url) {
+                image.src = url.toString()
+            })
+        })
+
+
+        image.onclick = function () {
+            Promise.resolve(node.href).then(function (url) {
+                document.getElementById("imageView").style.display = "block";
+                document.getElementById("enlargedImage").src = url.toString();
+                if (node.caption !== undefined && node.caption !== "undefined" && node.caption !== "") {
+                    document.getElementById("caption").innerText = node.caption
+                } else {
+                    document.getElementById("caption").innerText = ""
+                }
+            })
+        }
+
+        document.getElementById("gallery-div").appendChild(image)
+
+        adjustUI()
+    }
+
+    class imageNode {
+
+        constructor(id, name, url, ref, caption) {
+            this.id = id
+            this.name = name
+            this.href = url
+            this.ref = ref
+            this.caption = caption
+        }
+    }
+
+    async function loadFromUID(uid) {
+        let user = await db.collection("users").doc(uid).get()
+        if (user.exists) {
+            document.getElementById("user-name").innerText = user.data()["name"]
+        }
+        let doc = await db.collection("personalPage").doc(uid).get()
+        if (doc.exists) {
+            let data = doc.data()
+
+            let imageFiles = data["images"]
+
+            for (let i=0; i<imageFiles.length; i++) {
+                let imageLink = data["images"][i]
+                let imageName = imageLink.split(RegExp('%2..*%2F(.*?)\\?alt'))[1]
+                let imageRef = storage.refFromURL(imageLink)
+                let imageURL = imageRef.getDownloadURL()
+                let imageCaption = data["captions"][imageLink]
+                let nodeID = generateUID(7)
+
+                let node = new imageNode(nodeID, imageName, imageURL, imageRef, imageCaption)
+                nodes.push(node)
+
+                await createNode(node)
+            }
+
+            if (data["background"]) {
+                document.getElementById("background-image").style.backgroundImage = "url(" + data["background"] + ")"
+            } else {
+                document.getElementById("background-image").style.backgroundImage = "url('./images/default-background.jpg')"
+            }
+
+            document.getElementById("user-description").innerText = data["profileDescription"]
+
+        } else {
+            alert("The page you requested does not exist!")
+            window.location("index.html")
+        }
+    }
+
+</script>
+
+<!-- Importing modules -->
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-analytics.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-storage.js"></script>
+
+
+<!-- Firebase Integration -->
+
+<script src="../credentials.js"></script>
+
+<script>
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+
+    let storage = firebase.storage();
+    let db = firebase.firestore();
+</script>
+
+</body>
+</html>
