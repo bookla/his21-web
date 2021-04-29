@@ -56,7 +56,7 @@
     <div id="white" style="position: absolute; left: 970px; top: 630px; width: 959px; height: 942px; background-color: white"></div>
     <div id="house-colour" style="position: absolute; left: 1001px; top: 630px; width: 937px; height: 893px; background-color: #4CAF50"></div>
     <img id="profile-picture" src="media/logo.JPG" style="position: absolute; left:969px; top: 550px; width: 925px; height: 925px" alt="profile picture">
-    <h1 id="name" style="position: absolute; left: 151px; top:190px; width: 1896px; text-align: left; font-size: 90pt; font-family: Yeseva-One,serif; color: rgb(9,9,68)">{user.name()}</h1>
+    <h1 id="name" style="position: absolute; left: 151px; bottom:1556px; width: 1896px; text-align: left; font-size: 90pt; font-family: Yeseva-One,serif; color: rgb(9,9,68); text-rendering: optimizeLegibility; font-weight: 400; -webkit-font-smoothing: antialiased;">{user.name()}</h1>
     <h2 id="university-course" class="course">{user.course}</h2>
     <img id="university-image" src="media/university-logo-templates.png" style="position: absolute; left:1207px; top: 1566px; width: 720px; height: 440px; object-fit: contain; object-position: right" alt="universityImage">
     <h2 id="is-Insurance" style="position: absolute; left: 36px; top: 20px; font-size: 40pt; margin-top: 30px; font-family: Yeseva-One, serif; color: rgb(9,9,68)">{university.isInsurance}</h2>
@@ -132,6 +132,10 @@
 
                 if (name.length > 21) {
                     document.getElementById("name").style.fontSize = "74pt"
+                }
+
+                if (name.length > 24) {
+                    document.getElementById("name").style.fontSize = "69pt"
                 }
 
                 let courseName;
