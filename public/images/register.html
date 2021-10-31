@@ -64,6 +64,9 @@
     let uid = ""
 
     function init() {
+        alert("You may no longer register your additional photos page. Please contact prom committee directly.")
+        return
+
         document.getElementById("yes").disabled = true
         document.getElementById("no").disabled = true
         firebase.auth().onAuthStateChanged(function(user) {

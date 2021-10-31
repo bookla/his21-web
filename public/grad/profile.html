@@ -85,9 +85,9 @@
     function toMain() {
         let json = getJsonFromUrl()
         if (json["page"] !== undefined) {
-            window.location = "index.html?page=" + json["page"]
+            window.top.location = "/graduates/" + json["page"]
         } else {
-            window.location = "index.html"
+            window.top.location = "/graduates/"
         }
     }
 
@@ -97,7 +97,7 @@
 
     function generateImage() {
         if (uid !== "") {
-            window.location = "generate-image.html" + "?uid=" + uid
+            window.top.location = "generate-image.html" + "?uid=" + uid
         }
     }
 
@@ -112,7 +112,7 @@
             uid = param["uid"]
             loadFromID(param["uid"])
         } else {
-            window.location = "./index.html"
+            window.top.location = "./index.html"
         }
     }
 
@@ -129,7 +129,7 @@
                     }
                 }
                 document.getElementById("uniName").onclick = function () {
-                    window.location = "university.html?id=" + uniID
+                    window.top.location = "university.html?id=" + uniID
                 }
                 adjustUI()
             } else {
@@ -350,7 +350,7 @@
         }
 
     }
-    
+
     function elem(id){
         return document.getElementById(id)
     }
@@ -380,7 +380,7 @@
         uniName.className = "uniName"
         uniName.style.paddingTop = "10px"
         uniName.onclick = function () {
-            window.location = "university.html?id=" + id
+            window.top.location = "university.html?id=" + id
         }
         uniDiv.appendChild(uniName)
 

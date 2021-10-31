@@ -45,7 +45,7 @@
     </div>
 </div>
 
-<script src="grad-support.js?v=35"></script>
+<script src="grad-support.js?v=37"></script>
 
 <script>
     let page = 0
@@ -53,17 +53,17 @@
     let pageSize = 10
 
     function fillForm() {
-        window.location = "../login.html?fwd=grad_form"
+        window.top.location = "../login.html?fwd=grad_form"
     }
 
     function toUni() {
-        window.location = "universities.html"
+        window.top.location = "universities.html"
     }
 
     function nextPage() {
         if (pageTotal !== 0 && page < pageTotal) {
             page += 1
-            window.location = "index.html?page=" + page.toString()
+            window.top.location = "../graduates/" + page.toString()
             //document.getElementById("students-list").innerHTML = ""
             //loadUsers()
             //updatePageIndicator()
@@ -73,7 +73,7 @@
     function lastPage() {
         if (page > 0) {
             page -= 1
-            window.location = "index.html?page=" + page.toString()
+            window.top.location = "../graduates/" + page.toString()
             //document.getElementById("students-list").innerHTML = ""
             //loadUsers()
             //updatePageIndicator()

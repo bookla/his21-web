@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Add friend's message</title>
+
+    <link rel="stylesheet" href="grad-style.css">
+    <link rel="stylesheet" href="../common-style.css">
+</head>
+<body onload="init()">
+
+<label>
+    <input type="text" class="singleLineBox" id="uid" required>
+</label>
+
+<label>
+    <textarea class="multiLineBox" rows="4" id="description" required></textarea>
+</label>
+
+<button onclick="save()">Save</button>
+
+<script src="../credentials.js"></script>
+<script src="grad-support.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-firestore.js"></script>
+
+<script>
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+
+    let db = firebase.firestore();
+
+    function save() {
+        db.collection("gradData").doc(document.getElementById("uid").value).update({caption: document.getElementById("description").value}).then(function () {
+            window.history.back()
+        })
+    }
+
+    function init() {
+        let param = getJsonFromUrl()
+        console.log(param)
+        if (param["uid"]) {
+            document.getElementById("uid").value = param["uid"]
+        }
+
+        firebase.auth().onAuthStateChanged(function(user) {
+            if (user) {
+                console.log(user.uid)
+            } else {
+                console.log("Not logged in")
+            }
+        })
+
+    }
+</script>
+
+</body>
+</html>

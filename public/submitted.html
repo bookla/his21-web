@@ -64,6 +64,9 @@
         }
 
         function editClicked() {
+            alert("You may no longer edit the form, if there's any change that must be made, please contact the prom committee directly.")
+            return
+
             if (confirm("If you put your form into edit mode, your form will be removed from the system and you will need to click submit again to save your edit. Your previous response will be restored but you will not be able to edit votes. Click [OK] to enter edit mode.")) {
                 db.collection("requests").doc("client-students").set({requiresUpdate: true});
                 db.collection("students").doc(uid).delete().then(function() {

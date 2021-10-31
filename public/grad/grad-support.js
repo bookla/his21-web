@@ -108,7 +108,12 @@ async function createCell(name, description, imageSrc, uid, doc, elem, link="pro
     cell.className = "cell"
     cell.onclick = function () {
         console.log(page)
-        window.location = link + ".html?" + idLink + "=" + uid.toString() + "&page=" + page
+        console.log(link)
+        if (link === "profile") {
+            window.top.location = "/profile/" + uid.toString() + "&page=" + page
+        } else {
+            window.top.location = link + ".html?" + idLink + "=" + uid.toString() + "&page=" + page
+        }
     }
 
     let imageDiv = doc.createElement("div")

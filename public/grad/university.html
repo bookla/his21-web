@@ -60,9 +60,9 @@
     function backToMain() {
         let json = getJsonFromUrl()
         if (json["page"] !== undefined) {
-            window.location = "universities.html?page=" + json["page"]
+            window.top.location = "universities.html?page=" + json["page"]
         } else {
-            window.location = "universities.html"
+            window.top.location = "universities.html"
         }
     }
 
@@ -164,7 +164,7 @@
                 document.getElementById("uni-img").src = data["img"]
             } else {
                 alert("University data does not exist on the database")
-                window.location = "universities.html"
+                window.top.location = "universities.html"
             }
         })
         db.collection("gradData").where("universityID", "==", id).orderBy("name").get().then((docs) => {
@@ -227,7 +227,7 @@
             id = param["id"]
             loadUniversity(param["id"])
         } else {
-            window.location = "./universities.html"
+            window.top.location = "./universities.html"
         }
     }
 </script>
